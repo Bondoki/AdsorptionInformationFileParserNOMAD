@@ -19,7 +19,7 @@ configuration = config.get_plugin_entry_point(
 )
 
 
-class NewParser(MatchingParser):
+class AIFParser(MatchingParser):
     def parse(
         self,
         mainfile: str,
