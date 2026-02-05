@@ -1,0 +1,29 @@
+{
+  "template": "https://github.com/FAIRmat-NFDI/cookiecutter-nomad-plugin",
+  "commit": "f942403ed913de05af91db50209d494ccea148a3",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "full_name": "Ron Dockhorn",
+      "email": "ron.dockhorn@tu-dresden.de",
+      "github_username": "Bondoki",
+      "plugin_name": "aifparser",
+      "module_name": "aifparser",
+      "short_description": "Parser for the .aif file (Adsorption Information File) for NOMAD",
+      "version": "0.1.0",
+      "license": "MIT",
+      "include_schema_package": false,
+      "include_normalizer": false,
+      "include_parser": true,
+      "include_app": false,
+      "include_example_uploads": false,
+      "include_action": false,
+      "_copy_without_render": [
+        "*.html"
+      ],
+      "_template": "https://github.com/FAIRmat-NFDI/cookiecutter-nomad-plugin",
+      "_commit": "f942403ed913de05af91db50209d494ccea148a3"
+    }
+  },
+  "directory": null
+}
