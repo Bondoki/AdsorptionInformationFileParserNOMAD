@@ -35,6 +35,7 @@ from aifparser.schema_packages.aif_schema_package import (
     #MyClassOneHDF5,
     MyClassTwo,
     #MyClassTwoHDF5,
+    AdsorptionInformationFile,
 )
 
 configuration = config.get_plugin_entry_point(
@@ -81,17 +82,24 @@ class AIFParser(MatchingParser):
         
         
         
-        archive.data = MyClassTwo()
+        archive.data = AdsorptionInformationFile()
+        
+        # Populate the information
+        archive.data.aif_operator = self.find_value(json_data, '_exptl_operator')
+        archive.data.aif_date = self.find_value(json_data, '_exptl_date')
+        archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        #
+        # Create JSON 
         # 
         child_archive = EntryArchive()
         # 
         # #my_name = 'And'
         filetype = 'json' # 'yaml' # "json"
         # 
-        example_filename = f'{basic_name}.archive.{filetype}'
+        example_filename = f'{basic_name[0]}.archive.{filetype}'
         # 
         child_archive.data = MyClassTwo()
-        child_archive.data.name = f'{basic_name}'
+        child_archive.data.name = f'{basic_name[0]}'
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc

@@ -28,6 +28,10 @@ from nomad.metainfo import (
     SubSection,
 )
 
+from nomad.metainfo import (
+    MSection, MCategory, Section, Quantity, Package, SubSection, MEnum,
+    Datetime, constraint)
+
 m_package = SchemaPackage()
 
 
@@ -132,6 +136,146 @@ class MyClassTwo(EntryData, ArchiveSection):
     )
 
 
+class AdsorptionInformationFileData(PlotSection, EntryData):
+    m_def = Section(
+        a_plotly_express={
+            'method': 'line',
+            'x': '#my_value',
+            'y': '#my_time',
+            'label': 'Example Express Plot',
+            'index': 0,
+            'layout': {
+                'title': {'text': 'Example Express Plot'},
+                'xaxis': {'title': {'text': 'x axis'}},
+                'yaxis': {'title': {'text': 'y axis'}},
+            },
+        },
+    )
+
+    name = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(
+            component='StringEditQuantity',
+        ),
+    )
+
+    my_value = Quantity(
+        type=float,
+        shape=['*'],
+        unit='K',
+        a_eln=ELNAnnotation(
+            component='NumberEditQuantity',
+            defaultDisplayUnit='celsius',
+        ),
+    )
+
+    my_time = Quantity(
+        type=float,
+        shape=['*'],
+        unit='s',
+        a_eln=ELNAnnotation(
+            component='NumberEditQuantity',
+            defaultDisplayUnit='minute',
+        ),
+    )
+        
+    TGA_Mass_Subtrate = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='The measured mass at temperature in the TGA, given in percent.',
+        a_eln=dict(label='AIF mass', defaultDisplayUnit = 'dimensionless'),
+    )
+
+class AdsorptionInformationFile(EntryData, ArchiveSection):
+    """
+    An example class
+    """
+
+    m_def = Section(
+        a_plot=[
+            dict(
+                label='Pressure and Temperature',
+                x=[
+                    'my_class_one/0/my_time',
+                ],
+                y=[
+                    'my_class_one/0/my_value',
+                ],
+                lines=[
+                    dict(
+                        mode='lines',
+                        line=dict(
+                            color='rgb(25, 46, 135)',
+                        ),
+                    ),
+                    dict(
+                        mode='lines',
+                        line=dict(
+                            color='rgb(0, 138, 104)',
+                        ),
+                    ),
+                ],
+            ),
+            # dict(
+            #     x='sources/0/vapor_source/power/time',
+            #     y='sources/0/vapor_source/power/value',
+            # ),
+        ],
+        a_eln={
+            "overview": True,
+            "hide": [
+                #"name",
+                "lab_id",
+                "method",
+                "samples",
+                "measurement_identifiers"
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "name",
+                    "datetime",
+                    "location",
+                    "data_as_txt_file",
+                    "TGA_Sample_Mass",
+                    "TGA_Temperature_Start",
+                    "TGA_Temperature_End",
+                    "TGA_Rate",
+                    "description"
+                ]
+            }
+        },
+    )
+
+    aif_operator = Quantity(
+        type=str,
+        description='name of the person who ran the experiment (string).',
+        a_eln={
+            "label": "Operator",
+        },
+    )
+        
+    aif_date = Quantity(
+        type=Datetime,
+        description='date of the experiment (string in ISO 8601 format)',
+        a_eln={
+            "label": "Date",
+        },
+    )
+    
+    aif_instrument = Quantity(
+        type=str,
+        description='instrument id used for the experiment (string)',
+        a_eln={
+            "label": "Instrument",
+        },
+    )
+    
+    my_class_one = SubSection(
+        section_def=MyClassOne,
+        repeats=True,
+    )
 
 class MyClassThree(PlotSection, EntryData):
     """
