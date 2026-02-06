@@ -77,6 +77,23 @@ class MyClassOne(PlotSection, EntryData):
             defaultDisplayUnit='minute',
         ),
     )
+    
+    aif_instrument = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(
+            component='StringEditQuantity',
+            label="Instrument",
+            editable="False",
+        ),
+    )
+        
+    aif_instrument2 = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(
+            component='StringEditQuantity',
+            label="Instrument2",
+        ),
+    )
         
     TGA_Mass_Subtrate = Quantity(
         type=np.float64,
@@ -136,6 +153,14 @@ class MyClassTwo(EntryData, ArchiveSection):
             component='StringEditQuantity',
             label="Instrument",
             editable="False",
+        ),
+    )
+
+    aif_instrument2 = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(
+            component='StringEditQuantity',
+            label="Instrument2",
         ),
     )
 

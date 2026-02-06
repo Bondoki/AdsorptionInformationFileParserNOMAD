@@ -89,6 +89,7 @@ class AIFParser(MatchingParser):
         archive.data.name = self.find_value(json_data, '_exptl_operator')
         #archive.data.aif_date = self.find_value(json_data, '_exptl_date')
         archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        archive.data.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         #
         # Create JSON 
         # 
@@ -106,17 +107,19 @@ class AIFParser(MatchingParser):
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
         # 
-        # my_class_one_subsec = MyClassOne()
-        # my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
+        my_class_one_subsec = MyClassOne()
+        my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
+        my_class_one_subsec.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        my_class_one_subsec.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         # #my_class_one_subsec.my_value = df_csv['ValueTwo']
         # #my_class_one_subsec.my_time = df_csv['ValueTwo2']
         # 
         # # check which args the function m_add_subsection accepts here:
         # # packages/nomad-FAIR/nomad/metainfo/metainfo.py
         # # DO NOT use list.append() to add a subsection to a section!
-        # child_archive.data.m_add_sub_section(
-        #     MyClassTwo.my_class_one, my_class_one_subsec
-        # )
+        child_archive.data.m_add_sub_section(
+            MyClassTwo.my_class_one, my_class_one_subsec
+        )
         # 
         # create_archive(
         #     child_archive.m_to_dict(with_root_def=True),
