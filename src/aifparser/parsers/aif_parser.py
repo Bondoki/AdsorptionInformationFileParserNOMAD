@@ -88,7 +88,7 @@ class AIFParser(MatchingParser):
         #archive.data.aif_operator = self.find_value(json_data, '_exptl_operator')
         archive.data.name = self.find_value(json_data, '_exptl_operator')
         #archive.data.aif_date = self.find_value(json_data, '_exptl_date')
-        #archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
         #
         # Create JSON 
         # 
@@ -101,6 +101,7 @@ class AIFParser(MatchingParser):
         # 
         child_archive.data = MyClassTwo()
         child_archive.data.name = f'{basic_name[0]}'
+        child_archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc

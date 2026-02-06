@@ -129,6 +129,15 @@ class MyClassTwo(EntryData, ArchiveSection):
             component='StringEditQuantity',
         ),
     )
+        
+    aif_instrument = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(
+            component='StringEditQuantity',
+            label="Instrument",
+            editable="False",
+        ),
+    )
 
     my_class_one = SubSection(
         section_def=MyClassOne,
