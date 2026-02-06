@@ -66,12 +66,12 @@ class AIFParser(MatchingParser):
         logger.info('AIFParser.parse', parameter=configuration.parameter)
 
         filename = mainfile.split('/')[-1]
-        name = filename.split('.')
+        basic_name = filename.split('.')
 
         # archive.data = CatalysisCollectionParserEntry(
         #     data_file=filename,
         # )
-        archive.metadata.entry_name = f'{name[0]} data file'
+        #archive.metadata.entry_name = f'{basic_name[0]} data file'
         
         # Read and import the aif file using gemmi
         aif = cif.read_file(str(mainfile))
@@ -79,47 +79,56 @@ class AIFParser(MatchingParser):
         # Convert string to JSON
         json_data= json.loads(aif.as_json())
         
-        # name = Quantity(
-        # type=str,
-        # #default='TestName',
-        # description='Name of the section or generic data.',
-        # a_eln={'component': 'StringEditQuantity'},
-        # )
         
         
-        archive.data = MyClassOne()
-
+        archive.data = MyClassTwo()
+        # 
         child_archive = EntryArchive()
-
-        my_name = 'And'
-        filetype = json # 'yaml' # "json"
-
-        example_filename = f'{my_name}.archive.{filetype}'
-
+        # 
+        # #my_name = 'And'
+        filetype = 'json' # 'yaml' # "json"
+        # 
+        example_filename = f'{basic_name}.archive.{filetype}'
+        # 
         child_archive.data = MyClassTwo()
-        child_archive.data.name = f'{my_name}'
-        # Call the function
-        #operator_value = find_value(json_data, '_exptl_operator')
-        #print(operator_value)  # Output: qc
-
-        my_class_one_subsec = MyClassOne()
-        my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
-        #my_class_one_subsec.my_value = df_csv['ValueTwo']
-        #my_class_one_subsec.my_time = df_csv['ValueTwo2']
-
-        # check which args the function m_add_subsection accepts here:
-        # packages/nomad-FAIR/nomad/metainfo/metainfo.py
-        # DO NOT use list.append() to add a subsection to a section!
-        child_archive.data.m_add_sub_section(
-            MyClassTwo.my_class_one, my_class_one_subsec
-        )
-
+        child_archive.data.name = f'{basic_name}'
+        # # Call the function
+        # #operator_value = find_value(json_data, '_exptl_operator')
+        # #print(operator_value)  # Output: qc
+        # 
+        # my_class_one_subsec = MyClassOne()
+        # my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
+        # #my_class_one_subsec.my_value = df_csv['ValueTwo']
+        # #my_class_one_subsec.my_time = df_csv['ValueTwo2']
+        # 
+        # # check which args the function m_add_subsection accepts here:
+        # # packages/nomad-FAIR/nomad/metainfo/metainfo.py
+        # # DO NOT use list.append() to add a subsection to a section!
+        # child_archive.data.m_add_sub_section(
+        #     MyClassTwo.my_class_one, my_class_one_subsec
+        # )
+        # 
+        # create_archive(
+        #     child_archive.m_to_dict(with_root_def=True),
+        #     archive.m_context,
+        #     example_filename,
+        #     filetype,
+        #     logger,
+        # )
+        # 
+        # archive.data = MyClassOne()
+        
+        #aif = MyClassTwo()
+        #aif.name = self.find_value(json_data, '_exptl_operator')
+        
+        # create_archive(
+        #         aif, archive, f'{basic_name}.archive.json'
+        #     )
+        
         create_archive(
-            child_archive.m_to_dict(),
+            child_archive.m_to_dict(with_root_def=True),
             archive.m_context,
             example_filename,
             filetype,
             logger,
         )
-
-        archive.data = MyClassOne()
