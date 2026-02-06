@@ -82,12 +82,13 @@ class AIFParser(MatchingParser):
         
         
         
-        archive.data = AdsorptionInformationFile()
+        archive.data = MyClassTwo()#AdsorptionInformationFile()
         
         # Populate the information
-        archive.data.aif_operator = self.find_value(json_data, '_exptl_operator')
-        archive.data.aif_date = self.find_value(json_data, '_exptl_date')
-        archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        #archive.data.aif_operator = self.find_value(json_data, '_exptl_operator')
+        archive.data.name = self.find_value(json_data, '_exptl_operator')
+        #archive.data.aif_date = self.find_value(json_data, '_exptl_date')
+        #archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
         #
         # Create JSON 
         # 
