@@ -26,6 +26,7 @@ maintainers = [
 license = { file = "LICENSE" }
 dependencies = [
     "nomad-lab>=1.4.0",
+    "gemmi>=0.7.4",
     
 ]
 
@@ -129,7 +130,8 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [project.entry-points.'nomad.plugin']
-parser_entry_point = "aifparser.parsers:parser_entry_point"
+aif_parser_entry_point = "aifparser.parsers:aif_parser_entry_point"
+aif_schema_package_entry_point = "aifparser.schema_packages:aif_schema_package_entry_point"
 
 
 

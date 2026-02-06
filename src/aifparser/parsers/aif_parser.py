@@ -1,0 +1,125 @@
+from typing import (
+    TYPE_CHECKING,
+)
+
+if TYPE_CHECKING:
+    from structlog.stdlib import (
+        BoundLogger,
+    )
+
+from nomad.datamodel.datamodel import (
+        EntryArchive,
+    )
+
+from nomad.config import config
+from nomad.datamodel.metainfo.workflow import Workflow
+from nomad.parsing.parser import MatchingParser
+# from nomad.parsing.file_parser import Quantity
+from nomad.metainfo import (
+    MSection,
+    Package,
+    SchemaPackage,
+    Quantity,
+    )
+
+from gemmi import cif
+import json
+
+from aifparser.parsers.utils import (
+    create_archive,
+)
+
+from aifparser.schema_packages.aif_schema_package import (
+    MyClassFive,
+    MyClassOne,
+    #MyClassOneHDF5,
+    MyClassTwo,
+    #MyClassTwoHDF5,
+)
+
+configuration = config.get_plugin_entry_point(
+    'aifparser.parsers:aif_parser_entry_point'
+)
+
+
+class AIFParser(MatchingParser):
+  
+    def find_value(self, data, target_key):
+        if isinstance(data, dict):
+            for key, value in data.items():
+               if key == target_key:
+                    return value
+               # Recursion is needed if the value is a nested dictionary
+               elif isinstance(value, dict):
+                   result = self.find_value(value, target_key)
+                   if result is not None:
+                        return result
+        return None
+    
+    def parse(
+        self,
+        mainfile: str,
+        archive: 'EntryArchive',
+        logger: 'BoundLogger',
+        child_archives: dict[str, 'EntryArchive'] = None,
+    ) -> None:
+        logger.info('AIFParser.parse', parameter=configuration.parameter)
+
+        filename = mainfile.split('/')[-1]
+        name = filename.split('.')
+
+        # archive.data = CatalysisCollectionParserEntry(
+        #     data_file=filename,
+        # )
+        archive.metadata.entry_name = f'{name[0]} data file'
+        
+        # Read and import the aif file using gemmi
+        aif = cif.read_file(str(mainfile))
+        
+        # Convert string to JSON
+        json_data= json.loads(aif.as_json())
+        
+        # name = Quantity(
+        # type=str,
+        # #default='TestName',
+        # description='Name of the section or generic data.',
+        # a_eln={'component': 'StringEditQuantity'},
+        # )
+        
+        
+        archive.data = MyClassOne()
+
+        child_archive = EntryArchive()
+
+        my_name = 'And'
+        filetype = json # 'yaml' # "json"
+
+        example_filename = f'{my_name}.archive.{filetype}'
+
+        child_archive.data = MyClassTwo()
+        child_archive.data.name = f'{my_name}'
+        # Call the function
+        #operator_value = find_value(json_data, '_exptl_operator')
+        #print(operator_value)  # Output: qc
+
+        my_class_one_subsec = MyClassOne()
+        my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
+        #my_class_one_subsec.my_value = df_csv['ValueTwo']
+        #my_class_one_subsec.my_time = df_csv['ValueTwo2']
+
+        # check which args the function m_add_subsection accepts here:
+        # packages/nomad-FAIR/nomad/metainfo/metainfo.py
+        # DO NOT use list.append() to add a subsection to a section!
+        child_archive.data.m_add_sub_section(
+            MyClassTwo.my_class_one, my_class_one_subsec
+        )
+
+        create_archive(
+            child_archive.m_to_dict(),
+            archive.m_context,
+            example_filename,
+            filetype,
+            logger,
+        )
+
+        archive.data = MyClassOne()
