@@ -92,6 +92,9 @@ class MyClassOne(PlotSection, EntryData):
         a_eln=ELNAnnotation(
             component='StringEditQuantity',
             label="Instrument2",
+            visible='True',
+            editable='False'
+
         ),
     )
         
@@ -158,10 +161,17 @@ class MyClassTwo(EntryData, ArchiveSection):
 
     aif_instrument2 = Quantity(
         type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-            label="Instrument2",
-        ),
+        # a_eln=ELNAnnotation(
+        #     component='StringEditQuantity',
+        #     label="Instrument2",
+        # ),
+        a_eln={
+          'component':'StringEditQuantity',
+          'properties': {
+            'input_value':'False',
+          }
+        #     label="Instrument2",
+        },
     )
 
     my_class_one = SubSection(

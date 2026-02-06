@@ -103,6 +103,7 @@ class AIFParser(MatchingParser):
         child_archive.data = MyClassTwo()
         child_archive.data.name = f'{basic_name[0]}'
         child_archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        child_archive.data.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
