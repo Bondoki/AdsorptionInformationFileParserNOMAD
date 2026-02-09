@@ -466,7 +466,9 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             # Get the Viridis color scale
             viridis_colors = px.colors.sequential.Viridis
             
-            spectral_colors = px.colors.sequential.Spectral
+            #spectral_colors = px.colors.sequential.Spectral
+            
+            turbo_colors = px.colors.sequential.Turbo
             
             #color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
             
