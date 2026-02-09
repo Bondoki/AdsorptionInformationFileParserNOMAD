@@ -166,7 +166,8 @@ class MyClassTwo(EntryData, ArchiveSection):
     )
 
 
-class AdsorptionInformationFileData(PlotSection, EntryData):
+#class AdsorptionInformationFileData(PlotSection, EntryData):
+class AdsorptionInformationFileData(EntryData):
     m_def = Section(
         label_quantity='aif_data_experiment_type',
         a_eln={
@@ -201,9 +202,11 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
 
     aif_data_experiment_type = Quantity(
         type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-        ),
+        description='type of experiment e.g. adsorption/desorption - for displaying, only (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'experiment Type',
+        },
     )
 
     # my_value = Quantity(
@@ -463,7 +466,17 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             # Get the Viridis color scale
             viridis_colors = px.colors.sequential.Viridis
             
-            color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
+            spectral_colors = px.colors.sequential.Spectral
+            
+            #color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
+            
+            color_index_line = (
+                int(idx / (len(self.aif_dataset) - 1) * (len(viridis_colors) - 1)) 
+                if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorped' 
+                else int(idx / (len(self.aif_dataset) - 1) * (len(spectral_colors) - 1)) if len(self.aif_dataset) > 1 
+                else 0
+            )
+
             
             fig.add_trace(go.Scatter(
                 x=x,
@@ -472,7 +485,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                 name=f'{aif_data_entries.aif_data_experiment_type}: {idx}',
                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-                marker=dict(size=5, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorped' else 'diamond')      # Marker size
+                marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorped' else 'diamond')      # Marker size
             ))
 
         # exemply use the first entry for the units
