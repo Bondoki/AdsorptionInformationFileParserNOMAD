@@ -470,23 +470,40 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             
             #color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
             
+#             color_index_line = (
+#                 int(idx / (len(self.aif_dataset) - 1) * (len(viridis_colors) - 1)) 
+#                 if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorped' 
+#                 else int(idx / (len(self.aif_dataset) - 1) * (len(spectral_colors) - 1)) if len(self.aif_dataset) > 1 
+#                 else 0
+#             )
+# 
+#             
+#             fig.add_trace(go.Scatter(
+#                 x=x,
+#                 y=y,
+#                 mode='lines+markers',  # 'lines+markers' to show both lines and markers
+#                 name=f'{aif_data_entries.aif_data_experiment_type}: {idx}',
+#                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+#                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+#                 marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorped' else 'diamond')      # Marker size
+#             ))
             color_index_line = (
-                int(idx / (len(self.aif_dataset) - 1) * (len(viridis_colors) - 1)) 
-                if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorped' 
-                else int(idx / (len(self.aif_dataset) - 1) * (len(spectral_colors) - 1)) if len(self.aif_dataset) > 1 
+                int(idx / (len(self.aif_dataset) - 1) * (len(viridis_colors) - 1))
+                if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorption'
+                else int(idx / (len(self.aif_dataset) - 1) * (len(turbo_colors) - 1)) if len(self.aif_dataset) > 1
                 else 0
             )
 
-            
             fig.add_trace(go.Scatter(
                 x=x,
                 y=y,
                 mode='lines+markers',  # 'lines+markers' to show both lines and markers
                 name=f'{aif_data_entries.aif_data_experiment_type}: {idx}',
-                line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                line=dict(color=viridis_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else turbo_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-                marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorped' else 'diamond')      # Marker size
+                marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond')      # Marker size
             ))
+
 
         # exemply use the first entry for the units
         x_label = 'relative pressure'
