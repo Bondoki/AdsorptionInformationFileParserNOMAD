@@ -131,19 +131,21 @@ class AIFParser(MatchingParser):
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
         # 
-        aif_data = AdsorptionInformationFileData()
-        aif_data.name = self.find_value(json_data, '_exptl_operator')
+        # Adsorption
+        aif_data_adsorption = AdsorptionInformationFileData()
+        aif_data_adsorption.experiment_type = 'adsorption'
         
         if (self.find_value(json_data, '_adsorp_pressure')) is not None:
-          aif_data.aif_data_adsorp_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_pressure'), self.find_value(json_data, '_units_pressure').lower())
+          aif_data_adsorption.aif_data_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_pressure'), self.find_value(json_data, '_units_pressure').lower())
         
         if (self.find_value(json_data, '_adsorp_p0')) is not None:
-          aif_data.aif_data_adsorp_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.find_value(json_data, '_units_pressure').lower())
+          aif_data_adsorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.find_value(json_data, '_units_pressure').lower())
         
         if (self.find_value(json_data, '_adsorp_loading')) is not None:
-          aif_data.aif_data_adsorp_loading = ureg.Quantity(self.find_value(json_data, '_adsorp_loading'), 'dimensionless')
+          aif_data_adsorption.aif_data_loading = ureg.Quantity(self.find_value(json_data, '_adsorp_loading'), 'dimensionless')
         
-        aif_data.aif_data_adsorp_loading_unit = self.find_value(json_data, '_units_loading')
+        aif_data_adsorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
+        
         
         #my_class_one_subsec.aif_instrument = self.find_value(json_data, '_exptl_instrument')
         #my_class_one_subsec.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
@@ -154,7 +156,7 @@ class AIFParser(MatchingParser):
         # # packages/nomad-FAIR/nomad/metainfo/metainfo.py
         # # DO NOT use list.append() to add a subsection to a section!
         child_archive.data.m_add_sub_section(
-            AdsorptionInformationFile.aif_dataset, aif_data
+            AdsorptionInformationFile.aif_dataset, aif_data_adsorption
         )
         # 
         # create_archive(

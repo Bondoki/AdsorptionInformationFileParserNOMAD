@@ -2,6 +2,7 @@ from typing import (
     TYPE_CHECKING,
 )
 
+import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
@@ -167,7 +168,7 @@ class MyClassTwo(EntryData, ArchiveSection):
 
 class AdsorptionInformationFileData(PlotSection, EntryData):
     m_def = Section(
-        label_quantity='name',
+        label_quantity='experiment_type',
         a_eln={
             # "overview": False,
             # "hide": [
@@ -179,7 +180,7 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
             # ],
             "properties": {
                 "order": [
-                    "name",
+                    "experiment_type",
                     "data_as_txt_file",
                     "CV_Scanrate",
                 ]
@@ -199,42 +200,42 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         # },
     )
 
-    name = Quantity(
+    experiment_type = Quantity(
         type=str,
         a_eln=ELNAnnotation(
             component='StringEditQuantity',
         ),
     )
 
-    my_value = Quantity(
-        type=float,
-        shape=['*'],
-        unit='K',
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-            defaultDisplayUnit='celsius',
-        ),
-    )
-
-    my_time = Quantity(
-        type=float,
-        shape=['*'],
-        unit='s',
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-            defaultDisplayUnit='minute',
-        ),
-    )
-        
-    TGA_Mass_Subtrate = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='dimensionless',
-        description='The measured mass at temperature in the TGA, given in percent.',
-        a_eln=dict(label='AIF mass', defaultDisplayUnit = 'dimensionless'),
-    )
+    # my_value = Quantity(
+    #     type=float,
+    #     shape=['*'],
+    #     unit='K',
+    #     a_eln=ELNAnnotation(
+    #         component='NumberEditQuantity',
+    #         defaultDisplayUnit='celsius',
+    #     ),
+    # )
+    # 
+    # my_time = Quantity(
+    #     type=float,
+    #     shape=['*'],
+    #     unit='s',
+    #     a_eln=ELNAnnotation(
+    #         component='NumberEditQuantity',
+    #         defaultDisplayUnit='minute',
+    #     ),
+    # )
+#         
+#     TGA_Mass_Subtrate = Quantity(
+#         type=np.float64,
+#         shape=["*"],
+#         unit='dimensionless',
+#         description='The measured mass at temperature in the TGA, given in percent.',
+#         a_eln=dict(label='AIF mass', defaultDisplayUnit = 'dimensionless'),
+#     )
     
-    aif_data_adsorp_pressure = Quantity(
+    aif_data_pressure = Quantity(
         type=np.float64,
         shape=["*"],
         unit='kPa',
@@ -245,7 +246,7 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         },
     )
     
-    aif_data_adsorp_saturation_pressure = Quantity(
+    aif_data_saturation_pressure = Quantity(
         type=np.float64,
         shape=["*"],
         unit='kPa',
@@ -256,7 +257,7 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         },
     )
     
-    aif_data_adsorp_loading = Quantity(
+    aif_data_loading = Quantity(
         type=np.float64,
         shape=["*"],
         unit='dimensionless',
@@ -267,9 +268,16 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         },
     )
         
-    aif_data_adsorp_loading_unit = str('')
+    aif_data_loading_unit = Quantity(
+        type=str,
+        description='units of amount adsorbed - for displaying, only (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Loading Unit',
+        },
+    )
 
-class AdsorptionInformationFile(EntryData, ArchiveSection):
+class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     """
     An example class
     """
@@ -444,10 +452,10 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
         for idx, aif_data_entries in enumerate(self.aif_dataset):
             #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
             # Add line plots
-            x1 = aif_data_entries.aif_data_adsorp_pressure.to(aif_data_entries.aif_data_adsorp_pressure.units).magnitude
-            x2 = aif_data_entries.aif_data_adsorp_saturation_pressure.to(aif_data_entries.aif_data_adsorp_saturation_pressure.units).magnitude
+            x1 = aif_data_entries.aif_data_pressure.to(aif_data_entries.aif_data_pressure.units).magnitude
+            x2 = aif_data_entries.aif_data_saturation_pressure.to(aif_data_entries.aif_data_saturation_pressure.units).magnitude
             x= x1/x2
-            y = aif_data_entries.aif_data_adsorp_loading.to(aif_data_entries.aif_data_adsorp_loading.units).magnitude
+            y = aif_data_entries.aif_data_loading.to(aif_data_entries.aif_data_loading.units).magnitude
             
             
             # Get the Viridis color scale
@@ -467,10 +475,10 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
 
         # exemply use the first entry for the units
         x_label = 'relative pressure'
-        xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_adsorp_pressure.units:~}/{self.aif_dataset[0].aif_data_adsorp_saturation_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~}/{self.aif_dataset[0].aif_data_saturation_pressure.units:~})'#(1/cm)' the ':~' gives the short form
         
         y_label = 'amount adsorbed'
-        yaxis_title = f'{y_label} ({self.aif_dataset[0].aif_data_adsorp_loading_unit})'
+        yaxis_title = f'{y_label} ({self.aif_dataset[0].aif_data_loading_unit})'
         
         fig.update_layout(
             title=f'{y_label} over {x_label} - Adsorption Information File',
