@@ -110,14 +110,41 @@ class AIFParser(MatchingParser):
         child_archive.data.aif_adsorptive_name = self.find_value(json_data, '_exptl_adsorptive_name')
         
         # child_archive.data.aif_temperature = self.find_value(json_data, '_exptl_temperature')
-        child_archive.data.aif_temperature = ureg.Quantity(float(self.find_value(json_data, '_exptl_temperature')), self.find_value(json_data, '_units_temperature').upper())
+        if (self.find_value(json_data, '_exptl_temperature')) is not None:
+          child_archive.data.aif_temperature = ureg.Quantity(float(self.find_value(json_data, '_exptl_temperature')), self.find_value(json_data, '_units_temperature').upper())
+        
+        child_archive.data.aif_method = self.find_value(json_data, '_exptl_method')
+        child_archive.data.aif_isotherm_type = self.find_value(json_data, '_exptl_isotherm_type')
+        
+        if (self.find_value(json_data, '_exptl_p0')) is not None:
+          child_archive.data.aif_saturation_pressure = ureg.Quantity(float(self.find_value(json_data, '_exptl_p0')), self.find_value(json_data, '_units_pressure'))
+        
+        child_archive.data.aif_digitizer = self.find_value(json_data, '_exptl_digitizer')
+        
+        if (self.find_value(json_data, '_exptl_sample_mass')) is not None:
+          child_archive.data.aif_sample_mass = ureg.Quantity(float(self.find_value(json_data, '_exptl_sample_mass')), self.find_value(json_data, '_units_mass').lower().replace('g', 'gram'))
+        
+        child_archive.data.aif_sample_id = self.find_value(json_data, '_sample_id')
+        child_archive.data.aif_sample_material_id = self.find_value(json_data, '_sample_material_id')
         
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
         # 
-        my_class_one_subsec = AdsorptionInformationFileData()
-        my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
+        aif_data = AdsorptionInformationFileData()
+        aif_data.name = self.find_value(json_data, '_exptl_operator')
+        
+        if (self.find_value(json_data, '_adsorp_pressure')) is not None:
+          aif_data.aif_data_adsorp_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_pressure'), self.find_value(json_data, '_units_pressure').lower())
+        
+        if (self.find_value(json_data, '_adsorp_p0')) is not None:
+          aif_data.aif_data_adsorp_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.find_value(json_data, '_units_pressure').lower())
+        
+        if (self.find_value(json_data, '_adsorp_loading')) is not None:
+          aif_data.aif_data_adsorp_loading = ureg.Quantity(self.find_value(json_data, '_adsorp_loading'), 'dimensionless')
+        
+        aif_data.aif_data_adsorp_loading_unit = self.find_value(json_data, '_units_loading')
+        
         #my_class_one_subsec.aif_instrument = self.find_value(json_data, '_exptl_instrument')
         #my_class_one_subsec.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         # #my_class_one_subsec.my_value = df_csv['ValueTwo']
@@ -127,7 +154,7 @@ class AIFParser(MatchingParser):
         # # packages/nomad-FAIR/nomad/metainfo/metainfo.py
         # # DO NOT use list.append() to add a subsection to a section!
         child_archive.data.m_add_sub_section(
-            AdsorptionInformationFile.aif_dataset, my_class_one_subsec
+            AdsorptionInformationFile.aif_dataset, aif_data
         )
         # 
         # create_archive(

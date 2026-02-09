@@ -169,8 +169,8 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
     m_def = Section(
         a_plotly_express={
             'method': 'line',
-            'x': '#my_value',
-            'y': '#my_time',
+            'x': '#aif_data_adsorp_pressure',
+            'y': '#aif_data_adsorp_loading',
             'label': 'Example Express Plot',
             'index': 0,
             'layout': {
@@ -215,6 +215,41 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         description='The measured mass at temperature in the TGA, given in percent.',
         a_eln=dict(label='AIF mass', defaultDisplayUnit = 'dimensionless'),
     )
+    
+    aif_data_adsorp_pressure = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='kPa',
+        description='equilibrium pressure of the adsorption measurement (float)',
+        a_eln={
+            'label': 'Adsorption Pressure',
+            'defaultDisplayUnit': 'kPa',
+        },
+    )
+    
+    aif_data_adsorp_saturation_pressure = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='kPa',
+        description='saturation pressure of the adsorption measurement at the temperature of the experiment (float)',
+        a_eln={
+            'label': 'Adsorption Saturation Pressure',
+            'defaultDisplayUnit': 'kPa',
+        },
+    )
+    
+    aif_data_adsorp_loading = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='amount adsorbed during the adsorption measurement (float)',
+        a_eln={
+            'label': 'Adsorption Amount (Loading)',
+            'defaultDisplayUnit': 'dimensionless',
+        },
+    )
+        
+    aif_data_adsorp_loading_unit = str('')
 
 class AdsorptionInformationFile(EntryData, ArchiveSection):
     """
@@ -226,10 +261,10 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
             dict(
                 label='Pressure and Temperature',
                 x=[
-                    'aif_dataset/0/my_time',
+                    'aif_dataset/0/aif_data_adsorp_pressure',
                 ],
                 y=[
-                    'aif_dataset/0/my_value',
+                    'aif_dataset/0/aif_data_adsorp_loading',
                 ],
                 lines=[
                     dict(
@@ -324,19 +359,129 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
     
     aif_temperature = Quantity(
         type=np.float64,
-        unit='celsius',
+        unit='kelvin',
         description='temperature of the experiment (float)',
         a_eln={
              'component': 'NumberEditQuantity',
              'label': 'Temperature',
-             'defaultDisplayUnit': 'celsius',
+             'defaultDisplayUnit': 'kelvin',
         },
     )
+        
+    aif_method = Quantity(
+        type=str,
+        description='description of method used to determine amount adsorbed, eg. volumetric (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Method',
+        },
+    )
+    
+    aif_isotherm_type = Quantity(
+        type=str,
+        description='description of isotherm type, eg. absolute, excess, net (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Isotherm Type',
+        },
+    )
+    
+    aif_saturation_pressure = Quantity(
+        type=np.float64,
+        unit='kPa',
+        description='saturation pressure of the experiment at the temperature of the experiment (float)',
+        a_eln={
+             'component': 'NumberEditQuantity',
+             'label': 'Saturation Pressure',
+             'defaultDisplayUnit': 'kPa',
+        },
+    )
+    
+    aif_digitizer = Quantity(
+        type=str,
+        description='name of the person who digitized the experiment (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Digitizer',
+        },
+    )
+        
+    aif_sample_mass = Quantity(
+        type=np.float64,
+        unit='gram',
+        description='mass of the sample (float)',
+        a_eln={
+             'component': 'NumberEditQuantity',
+             'label': 'Sample Mass',
+             'defaultDisplayUnit': 'gram',
+        },
+    )
+    
+    aif_sample_id = Quantity(
+        type=str,
+        description='unique identifying code used by the operator (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Sample ID',
+        },
+    )
+    
+    aif_sample_material_id = Quantity(
+        type=str,
+        description='designated name for the material (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Sample Material ID',
+        },
+    )
+    
     
     aif_dataset = SubSection(
         section_def=AdsorptionInformationFileData,
         repeats=True,
     )
+    
+    def normalize(self, archive, logger):
+        # plotly figure
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x=self.aif_dataset.aif_data_adsorp_pressure,
+                y=self.aif_dataset.aif_data_adsorp_loading,
+                name='amount adsorbed',
+                line=dict(color='#2A4CDF', width=4),
+                yaxis='y',
+            ),
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=self.aif_dataset.aif_data_adsorp_pressure/self.aif_dataset.aif_data_adsorp_saturation_pressure,
+                y=self.aif_dataset.aif_data_adsorp_loading,
+                name='normalized',
+                line=dict(color='#90002C', width=2),
+                yaxis='y',
+            ),
+        )
+        fig.update_layout(
+            template='plotly_white',
+            dragmode='zoom',
+            xaxis=dict(
+                fixedrange=False,
+                autorange=True,
+                title='relative pressure p/p0',
+                mirror='all',
+                showline=True,
+                gridcolor='#EAEDFC',
+            ),
+            yaxis=dict(
+                fixedrange=False,
+                title='amount adsorbed',
+                tickfont=dict(color='#2A4CDF'),
+                gridcolor='#EAEDFC',
+            ),
+            showlegend=True,
+        )
+        self.figures = [PlotlyFigure(label='AIF', figure=fig.to_plotly_json())]
 
 class MyClassThree(PlotSection, EntryData):
     """
