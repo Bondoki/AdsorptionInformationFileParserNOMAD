@@ -58,6 +58,17 @@ class AIFParser(MatchingParser):
                    if result is not None:
                         return result
         return None
+      
+    def check_pressure_unit(self, pressure: str) -> str:
+        if pressure == "Torr":
+            return "torr"
+        elif pressure == "Pascal":
+            return "pascal"
+        elif pressure == "Pa":
+            return "Pa"
+        elif pressure == "kPa":
+            return "kPa"
+        return pressure # Return the value if not known None  # Return None for any other value
     
     def parse(
         self,
@@ -117,7 +128,7 @@ class AIFParser(MatchingParser):
         child_archive.data.aif_isotherm_type = self.find_value(json_data, '_exptl_isotherm_type')
         
         if (self.find_value(json_data, '_exptl_p0')) is not None:
-          child_archive.data.aif_saturation_pressure = ureg.Quantity(float(self.find_value(json_data, '_exptl_p0')), self.find_value(json_data, '_units_pressure'))
+          child_archive.data.aif_saturation_pressure = ureg.Quantity(float(self.find_value(json_data, '_exptl_p0')), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
         child_archive.data.aif_digitizer = self.find_value(json_data, '_exptl_digitizer')
         
@@ -133,13 +144,13 @@ class AIFParser(MatchingParser):
         # 
         # Adsorption
         aif_data_adsorption = AdsorptionInformationFileData()
-        aif_data_adsorption.experiment_type = 'adsorption'
+        aif_data_adsorption.aif_data_experiment_type = 'adsorption'
         
         if (self.find_value(json_data, '_adsorp_pressure')) is not None:
-          aif_data_adsorption.aif_data_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_pressure'), self.find_value(json_data, '_units_pressure').lower())
+          aif_data_adsorption.aif_data_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_pressure'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
         if (self.find_value(json_data, '_adsorp_p0')) is not None:
-          aif_data_adsorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.find_value(json_data, '_units_pressure').lower())
+          aif_data_adsorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
         if (self.find_value(json_data, '_adsorp_loading')) is not None:
           aif_data_adsorption.aif_data_loading = ureg.Quantity(self.find_value(json_data, '_adsorp_loading'), 'dimensionless')
@@ -147,16 +158,31 @@ class AIFParser(MatchingParser):
         aif_data_adsorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
         
         
-        #my_class_one_subsec.aif_instrument = self.find_value(json_data, '_exptl_instrument')
-        #my_class_one_subsec.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
-        # #my_class_one_subsec.my_value = df_csv['ValueTwo']
-        # #my_class_one_subsec.my_time = df_csv['ValueTwo2']
-        # 
+        # Desorption
+        aif_data_desorption = AdsorptionInformationFileData()
+        aif_data_desorption.aif_data_experiment_type = 'desorption'
+        
+        if (self.find_value(json_data, '_desorp_pressure')) is not None:
+          aif_data_desorption.aif_data_pressure = ureg.Quantity(self.find_value(json_data, '_desorp_pressure'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
+        
+        if (self.find_value(json_data, '_desorp_p0')) is not None:
+          aif_data_desorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_desorp_p0'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
+        
+        if (self.find_value(json_data, '_desorp_loading')) is not None:
+          aif_data_desorption.aif_data_loading = ureg.Quantity(self.find_value(json_data, '_desorp_loading'), 'dimensionless')
+        
+        aif_data_desorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
+        
+        
         # # check which args the function m_add_subsection accepts here:
         # # packages/nomad-FAIR/nomad/metainfo/metainfo.py
         # # DO NOT use list.append() to add a subsection to a section!
         child_archive.data.m_add_sub_section(
             AdsorptionInformationFile.aif_dataset, aif_data_adsorption
+        )
+        
+        child_archive.data.m_add_sub_section(
+            AdsorptionInformationFile.aif_dataset, aif_data_desorption
         )
         # 
         # create_archive(

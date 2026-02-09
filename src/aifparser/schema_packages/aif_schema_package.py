@@ -168,7 +168,7 @@ class MyClassTwo(EntryData, ArchiveSection):
 
 class AdsorptionInformationFileData(PlotSection, EntryData):
     m_def = Section(
-        label_quantity='experiment_type',
+        label_quantity='aif_data_experiment_type',
         a_eln={
             # "overview": False,
             # "hide": [
@@ -180,9 +180,8 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
             # ],
             "properties": {
                 "order": [
-                    "experiment_type",
-                    "data_as_txt_file",
-                    "CV_Scanrate",
+                    "aif_data_experiment_type",
+                    "aif_data_loading_unit",
                 ]
             }
         },
@@ -200,7 +199,7 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         # },
     )
 
-    experiment_type = Quantity(
+    aif_data_experiment_type = Quantity(
         type=str,
         a_eln=ELNAnnotation(
             component='StringEditQuantity',
@@ -239,9 +238,9 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         type=np.float64,
         shape=["*"],
         unit='kPa',
-        description='equilibrium pressure of the adsorption measurement (float)',
+        description='equilibrium pressure of the adsorption/desorption measurement (float)',
         a_eln={
-            'label': 'Adsorption Pressure',
+            'label': 'Adsorption/Desorption Pressure',
             'defaultDisplayUnit': 'kPa',
         },
     )
@@ -250,9 +249,9 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         type=np.float64,
         shape=["*"],
         unit='kPa',
-        description='saturation pressure of the adsorption measurement at the temperature of the experiment (float)',
+        description='saturation pressure of the adsorption/desorption measurement at the temperature of the experiment (float)',
         a_eln={
-            'label': 'Adsorption Saturation Pressure',
+            'label': 'Adsorption/Desorption Saturation Pressure',
             'defaultDisplayUnit': 'kPa',
         },
     )
@@ -261,9 +260,9 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
         type=np.float64,
         shape=["*"],
         unit='dimensionless',
-        description='amount adsorbed during the adsorption measurement (float)',
+        description='amount adsorbed during the adsorption/desorption measurement (float)',
         a_eln={
-            'label': 'Adsorption Amount (Loading)',
+            'label': 'Adsorption/Desorption Amount (Loading)',
             'defaultDisplayUnit': 'dimensionless',
         },
     )
@@ -279,7 +278,7 @@ class AdsorptionInformationFileData(PlotSection, EntryData):
 
 class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     """
-    An example class
+    A class for the AIF file format
     """
 
     m_def = Section(
@@ -287,23 +286,26 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             "overview": True,
             "hide": [
                 #"name",
-                "lab_id",
-                "method",
-                "samples",
-                "measurement_identifiers"
+                #"lab_id",
+                #"method",
+                #"samples",
+                #"measurement_identifiers"
             ],
             "properties": {
                 "order": [
-                    "tags",
-                    "name",
-                    "datetime",
-                    "location",
-                    "data_as_txt_file",
-                    "TGA_Sample_Mass",
-                    "TGA_Temperature_Start",
-                    "TGA_Temperature_End",
-                    "TGA_Rate",
-                    "description"
+                    "aif_operator",
+                    "aif_date",
+                    "aif_instrument",
+                    "aif_adsorptive",
+                    "aif_adsorptive_name",
+                    "aif_temperature",
+                    "aif_sample_mass",
+                    "aif_method",
+                    "aif_isotherm_type",
+                    "aif_saturation_pressure",
+                    "aif_digitizer",
+                    "aif_sample_id",
+                    "aif_sample_material_id",
                 ]
             }
         },
@@ -467,10 +469,10 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                 x=x,
                 y=y,
                 mode='lines+markers',  # 'lines+markers' to show both lines and markers
-                name=f'adsorp: {idx}',
+                name=f'{aif_data_entries.aif_data_experiment_type}: {idx}',
                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-                marker=dict(size=5, symbol='circle')      # Marker size
+                marker=dict(size=5, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorped' else 'diamond')      # Marker size
             ))
 
         # exemply use the first entry for the units
