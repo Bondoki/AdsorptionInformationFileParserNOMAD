@@ -36,6 +36,7 @@ from aifparser.schema_packages.aif_schema_package import (
     MyClassTwo,
     #MyClassTwoHDF5,
     AdsorptionInformationFile,
+    AdsorptionInformationFileData,
 )
 
 configuration = config.get_plugin_entry_point(
@@ -82,14 +83,14 @@ class AIFParser(MatchingParser):
         
         
         
-        archive.data = MyClassTwo()#AdsorptionInformationFile()
+        # archive.data = MyClassTwo()#AdsorptionInformationFile()
         
         # Populate the information
         #archive.data.aif_operator = self.find_value(json_data, '_exptl_operator')
-        archive.data.name = self.find_value(json_data, '_exptl_operator')
+        # archive.data.name = self.find_value(json_data, '_exptl_operator')
         #archive.data.aif_date = self.find_value(json_data, '_exptl_date')
-        archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
-        archive.data.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
+        # archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        # archive.data.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         #
         # Create JSON 
         # 
@@ -100,18 +101,18 @@ class AIFParser(MatchingParser):
         # 
         example_filename = f'{basic_name[0]}.archive.{filetype}'
         # 
-        child_archive.data = MyClassTwo()
-        child_archive.data.name = f'{basic_name[0]}'
+        child_archive.data = AdsorptionInformationFile()
+        child_archive.data.aif_operator = self.find_value(json_data, '_exptl_operator') # f'{basic_name[0]}'
+        child_archive.data.aif_date = self.find_value(json_data, '_exptl_date')
         child_archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
-        child_archive.data.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
         # 
-        my_class_one_subsec = MyClassOne()
+        my_class_one_subsec = AdsorptionInformationFileData()
         my_class_one_subsec.name = self.find_value(json_data, '_exptl_operator')
-        my_class_one_subsec.aif_instrument = self.find_value(json_data, '_exptl_instrument')
-        my_class_one_subsec.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
+        #my_class_one_subsec.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        #my_class_one_subsec.aif_instrument2 = self.find_value(json_data, '_exptl_instrument')
         # #my_class_one_subsec.my_value = df_csv['ValueTwo']
         # #my_class_one_subsec.my_time = df_csv['ValueTwo2']
         # 
@@ -119,7 +120,7 @@ class AIFParser(MatchingParser):
         # # packages/nomad-FAIR/nomad/metainfo/metainfo.py
         # # DO NOT use list.append() to add a subsection to a section!
         child_archive.data.m_add_sub_section(
-            MyClassTwo.my_class_one, my_class_one_subsec
+            AdsorptionInformationFile.aif_dataset, my_class_one_subsec
         )
         # 
         # create_archive(

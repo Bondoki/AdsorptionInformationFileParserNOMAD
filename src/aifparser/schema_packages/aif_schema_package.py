@@ -293,25 +293,18 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
         },
     )
     
-    # aif_instrument = Quantity(
-    #     type=str,
-    #     description='instrument id used for the experiment (string)',
-    #     a_eln={
-    #         "label": "Instrument",
-    #     },
-    # )
-        
     aif_instrument = Quantity(
         type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-            label="Instrument",
-            editable="False",
-        ),
+        description='instrument id used for the experiment (string)',
+        a_eln={
+            "label": "Instrument",
+        },
     )
     
-    my_class_one = SubSection(
-        section_def=MyClassOne,
+    
+    
+    aif_dataset = SubSection(
+        section_def=AdsorptionInformationFileData,
         repeats=True,
     )
 
