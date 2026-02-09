@@ -113,7 +113,8 @@ def dict_nan_equal(dict1, dict2):
 def create_archive(
     entry_dict, context, filename, file_type, logger, *, overwrite: bool = False
 ):
-    file_exists = context.raw_path_exists(filename)
+    # file_exists = context.raw_path_exists(filename)
+    file_exists = getattr(context, 'raw_path_exists', lambda _: None)(filename)
     dicts_are_equal = None
     if isinstance(context, ClientContext):
         return None

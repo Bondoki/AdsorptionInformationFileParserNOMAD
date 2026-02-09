@@ -226,10 +226,10 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
             dict(
                 label='Pressure and Temperature',
                 x=[
-                    'my_class_one/0/my_time',
+                    'aif_dataset/0/my_time',
                 ],
                 y=[
-                    'my_class_one/0/my_value',
+                    'aif_dataset/0/my_value',
                 ],
                 lines=[
                     dict(
@@ -281,7 +281,8 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
         type=str,
         description='name of the person who ran the experiment (string).',
         a_eln={
-            "label": "Operator",
+            'component': 'StringEditQuantity',
+            'label': 'Operator',
         },
     )
         
@@ -289,7 +290,8 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
         type=Datetime,
         description='date of the experiment (string in ISO 8601 format)',
         a_eln={
-            "label": "Date",
+            'component': 'DateTimeEditQuantity',
+            'label': 'Date',
         },
     )
     
@@ -297,11 +299,39 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
         type=str,
         description='instrument id used for the experiment (string)',
         a_eln={
-            "label": "Instrument",
+            'component': 'StringEditQuantity',
+            'label': 'Instrument',
         },
     )
     
+    aif_adsorptive = Quantity(
+        type=str,
+        description='name of the adsorptive (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Adsorptive',
+        },
+    )
     
+    aif_adsorptive_name = Quantity(
+        type=str,
+        description='name of the adsorptive - secondary identifier (string)',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Adsorptive - sec. identifier',
+        },
+    )
+    
+    aif_temperature = Quantity(
+        type=np.float64,
+        unit='celsius',
+        description='temperature of the experiment (float)',
+        a_eln={
+             'component': 'NumberEditQuantity',
+             'label': 'Temperature',
+             'defaultDisplayUnit': 'celsius',
+        },
+    )
     
     aif_dataset = SubSection(
         section_def=AdsorptionInformationFileData,

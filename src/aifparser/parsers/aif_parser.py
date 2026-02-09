@@ -15,6 +15,7 @@ from nomad.config import config
 from nomad.datamodel.metainfo.workflow import Workflow
 from nomad.parsing.parser import MatchingParser
 # from nomad.parsing.file_parser import Quantity
+from nomad.units import ureg
 from nomad.metainfo import (
     MSection,
     Package,
@@ -105,6 +106,12 @@ class AIFParser(MatchingParser):
         child_archive.data.aif_operator = self.find_value(json_data, '_exptl_operator') # f'{basic_name[0]}'
         child_archive.data.aif_date = self.find_value(json_data, '_exptl_date')
         child_archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
+        child_archive.data.aif_adsorptive = self.find_value(json_data, '_exptl_adsorptive')
+        child_archive.data.aif_adsorptive_name = self.find_value(json_data, '_exptl_adsorptive_name')
+        
+        # child_archive.data.aif_temperature = self.find_value(json_data, '_exptl_temperature')
+        child_archive.data.aif_temperature = ureg.Quantity(float(self.find_value(json_data, '_exptl_temperature')), self.find_value(json_data, '_units_temperature').upper())
+        
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
@@ -141,7 +148,8 @@ class AIFParser(MatchingParser):
         #     )
         
         create_archive(
-            child_archive.m_to_dict(with_root_def=True),
+            # child_archive.m_to_dict(with_root_def=True),
+            child_archive.m_to_dict(),
             archive.m_context,
             example_filename,
             filetype,
