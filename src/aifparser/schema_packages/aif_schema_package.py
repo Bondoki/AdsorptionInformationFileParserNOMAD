@@ -167,18 +167,36 @@ class MyClassTwo(EntryData, ArchiveSection):
 
 class AdsorptionInformationFileData(PlotSection, EntryData):
     m_def = Section(
-        a_plotly_express={
-            'method': 'line',
-            'x': '#aif_data_adsorp_pressure',
-            'y': '#aif_data_adsorp_loading',
-            'label': 'Example Express Plot',
-            'index': 0,
-            'layout': {
-                'title': {'text': 'Example Express Plot'},
-                'xaxis': {'title': {'text': 'x axis'}},
-                'yaxis': {'title': {'text': 'y axis'}},
-            },
+        label_quantity='name',
+        a_eln={
+            # "overview": False,
+            # "hide": [
+            #     "name",
+            #     "lab_id",
+            #     "method",
+            #     "samples",
+            #     "measurement_identifiers"
+            # ],
+            "properties": {
+                "order": [
+                    "name",
+                    "data_as_txt_file",
+                    "CV_Scanrate",
+                ]
+            }
         },
+        # a_plotly_express={
+        #     'method': 'line',
+        #     'x': '#aif_data_adsorp_pressure',
+        #     'y': '#aif_data_adsorp_loading',
+        #     'label': 'Example Express Plot',
+        #     'index': 0,
+        #     'layout': {
+        #         'title': {'text': 'Example Express Plot'},
+        #         'xaxis': {'title': {'text': 'x axis'}},
+        #         'yaxis': {'title': {'text': 'y axis'}},
+        #     },
+        # },
     )
 
     name = Quantity(
@@ -257,35 +275,6 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
     """
 
     m_def = Section(
-        a_plot=[
-            dict(
-                label='Pressure and Temperature',
-                x=[
-                    'aif_dataset/0/aif_data_adsorp_pressure',
-                ],
-                y=[
-                    'aif_dataset/0/aif_data_adsorp_loading',
-                ],
-                lines=[
-                    dict(
-                        mode='lines',
-                        line=dict(
-                            color='rgb(25, 46, 135)',
-                        ),
-                    ),
-                    dict(
-                        mode='lines',
-                        line=dict(
-                            color='rgb(0, 138, 104)',
-                        ),
-                    ),
-                ],
-            ),
-            # dict(
-            #     x='sources/0/vapor_source/power/time',
-            #     y='sources/0/vapor_source/power/value',
-            # ),
-        ],
         a_eln={
             "overview": True,
             "hide": [
@@ -441,47 +430,98 @@ class AdsorptionInformationFile(EntryData, ArchiveSection):
         repeats=True,
     )
     
-    def normalize(self, archive, logger):
-        # plotly figure
+    def generate_plots(self) -> list[PlotlyFigure]:
+        """
+        Generate the plotly figures for the `MeasurementCV` section.
+
+        Returns:
+            list[PlotlyFigure]: The plotly figures.
+        """
+        figures = []
+        # Create the figure
         fig = go.Figure()
-        fig.add_trace(
-            go.Scatter(
-                x=self.aif_dataset.aif_data_adsorp_pressure,
-                y=self.aif_dataset.aif_data_adsorp_loading,
-                name='amount adsorbed',
-                line=dict(color='#2A4CDF', width=4),
-                yaxis='y',
-            ),
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=self.aif_dataset.aif_data_adsorp_pressure/self.aif_dataset.aif_data_adsorp_saturation_pressure,
-                y=self.aif_dataset.aif_data_adsorp_loading,
-                name='normalized',
-                line=dict(color='#90002C', width=2),
-                yaxis='y',
-            ),
-        )
+        
+        for idx, aif_data_entries in enumerate(self.aif_dataset):
+            #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
+            # Add line plots
+            x1 = aif_data_entries.aif_data_adsorp_pressure.to(aif_data_entries.aif_data_adsorp_pressure.units).magnitude
+            x2 = aif_data_entries.aif_data_adsorp_saturation_pressure.to(aif_data_entries.aif_data_adsorp_saturation_pressure.units).magnitude
+            x= x1/x2
+            y = aif_data_entries.aif_data_adsorp_loading.to(aif_data_entries.aif_data_adsorp_loading.units).magnitude
+            
+            
+            # Get the Viridis color scale
+            viridis_colors = px.colors.sequential.Viridis
+            
+            color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
+            
+            fig.add_trace(go.Scatter(
+                x=x,
+                y=y,
+                mode='lines+markers',  # 'lines+markers' to show both lines and markers
+                name=f'adsorp: {idx}',
+                line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                marker=dict(size=5, symbol='circle')      # Marker size
+            ))
+
+        # exemply use the first entry for the units
+        x_label = 'relative pressure'
+        xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_adsorp_pressure.units:~}/{self.aif_dataset[0].aif_data_adsorp_saturation_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        
+        y_label = 'amount adsorbed'
+        yaxis_title = f'{y_label} ({self.aif_dataset[0].aif_data_adsorp_loading_unit})'
+        
         fig.update_layout(
-            template='plotly_white',
-            dragmode='zoom',
+            title=f'{y_label} over {x_label} - Adsorption Information File',
+            xaxis_title=xaxis_title,
+            yaxis_title=yaxis_title,
             xaxis=dict(
                 fixedrange=False,
-                autorange=True,
-                title='relative pressure p/p0',
-                mirror='all',
-                showline=True,
-                gridcolor='#EAEDFC',
             ),
             yaxis=dict(
                 fixedrange=False,
-                title='amount adsorbed',
-                tickfont=dict(color='#2A4CDF'),
-                gridcolor='#EAEDFC',
             ),
+            #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+            template='plotly_white',
             showlegend=True,
+            hovermode="closest", #"x unified",
+            hoverdistance=10,
         )
-        self.figures = [PlotlyFigure(label='AIF', figure=fig.to_plotly_json())]
+        
+        fig.update_xaxes(showspikes=True,)  # <-- add this line
+        fig.update_yaxes(showspikes=True)  # <-- add this line
+        
+        # figures.append(
+        #     PlotlyFigure(
+        #         label=f'{y_label}-{x_label} linear plot',
+        #         #index=0,
+        #         figure=fig.to_plotly_json(),
+        #     ),
+        # )
+        
+        figure_json = fig.to_plotly_json()
+        figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+        
+        figures.append(
+            PlotlyFigure(
+                label=f'{y_label}-{x_label} linear plot',
+                figure=figure_json
+            )
+        )
+        
+        self.figures = figures
+
+        return figures
+    
+    
+    def normalize(self, archive, logger):
+        
+        if self.aif_dataset:
+            #Otherwise create plot
+            self.figures = self.generate_plots()
+        
+        super().normalize(archive, logger)
 
 class MyClassThree(PlotSection, EntryData):
     """
