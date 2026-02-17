@@ -69,6 +69,34 @@ class AIFParser(MatchingParser):
         elif pressure == "kPa":
             return "kPa"
         return pressure # Return the value if not known None  # Return None for any other value
+      
+    def check_mass_unit(self, mass: str) -> str:
+        if mass == "g":
+            return "gram"
+        elif mass == "kg":
+            return "kilogram"
+        return mass # Return the value if not known None  # Return None for any other value
+      
+    def check_temperature_unit(self, temperature: str) -> str:
+        if temperature == "k":
+            return "kelvin"
+        return temperature # Return the value if not known None  # Return None for any other value
+    
+    def check_density_unit(self, density: str) -> str:
+        if density == "g/cc":
+            return "gram/centimeter**3"
+        elif density == "kg/cc":
+            return "kilogram/centimeter**3"
+        return density # Return the value if not known None  # Return None for any other value
+    
+    def check_time_unit(self, time: str) -> str:
+        if time == "s":
+            return "second"
+        elif time == "min":
+            return "minute"
+        elif time == "h":
+            return "hour"
+        return time # Return the value if not known None  # Return None for any other value
     
     def parse(
         self,
@@ -114,6 +142,13 @@ class AIFParser(MatchingParser):
         example_filename = f'{basic_name[0]}.archive.{filetype}'
         # 
         child_archive.data = AdsorptionInformationFile()
+        
+        ###################
+        ###
+        # _exptl_* keywords
+        ###
+        ###################
+        
         child_archive.data.aif_operator = self.find_value(json_data, '_exptl_operator') # f'{basic_name[0]}'
         child_archive.data.aif_date = self.find_value(json_data, '_exptl_date')
         child_archive.data.aif_instrument = self.find_value(json_data, '_exptl_instrument')
@@ -122,7 +157,7 @@ class AIFParser(MatchingParser):
         
         # child_archive.data.aif_temperature = self.find_value(json_data, '_exptl_temperature')
         if (self.find_value(json_data, '_exptl_temperature')) is not None:
-          child_archive.data.aif_temperature = ureg.Quantity(float(self.find_value(json_data, '_exptl_temperature')), self.find_value(json_data, '_units_temperature').upper())
+          child_archive.data.aif_temperature = ureg.Quantity(float(self.find_value(json_data, '_exptl_temperature')), self.check_temperature_unit(self.find_value(json_data, '_units_temperature')))
         
         child_archive.data.aif_method = self.find_value(json_data, '_exptl_method')
         child_archive.data.aif_isotherm_type = self.find_value(json_data, '_exptl_isotherm_type')
@@ -132,11 +167,42 @@ class AIFParser(MatchingParser):
         
         child_archive.data.aif_digitizer = self.find_value(json_data, '_exptl_digitizer')
         
-        if (self.find_value(json_data, '_exptl_sample_mass')) is not None:
-          child_archive.data.aif_sample_mass = ureg.Quantity(float(self.find_value(json_data, '_exptl_sample_mass')), self.find_value(json_data, '_units_mass').lower().replace('g', 'gram'))
+        ###################
+        ###
+        # _adsnt_* keywords
+        ###
+        ###################
         
-        child_archive.data.aif_sample_id = self.find_value(json_data, '_sample_id')
+        # maybe obsolete '_exptl_sample_mass' -> '_adsnt_sample_mass'
+        if (self.find_value(json_data, '_exptl_sample_mass')) is not None:
+          child_archive.data.aif_sample_mass = ureg.Quantity(float(self.find_value(json_data, '_exptl_sample_mass')), self.check_mass_unit(self.find_value(json_data, '_units_mass')))
+        
+        if (self.find_value(json_data, '_adsnt_sample_mass')) is not None:
+          child_archive.data.aif_sample_mass = ureg.Quantity(float(self.find_value(json_data, '_adsnt_sample_mass')), self.check_mass_unit(self.find_value(json_data, '_units_mass')))
+        
+        if (self.find_value(json_data, '_adsnt_sample_density')) is not None:
+          child_archive.data.aif_sample_density = ureg.Quantity(float(self.find_value(json_data, '_adsnt_sample_density')), self.check_density_unit(self.find_value(json_data, '_units_density')))
+        
+        # maybe obsolete '_sample_id' -> '_adsnt_sample_id'
+        if (self.find_value(json_data, '_sample_id')) is not None:
+          child_archive.data.aif_sample_id = self.find_value(json_data, '_sample_id')
+          
+        if (self.find_value(json_data, '_adsnt_sample_id')) is not None:
+          child_archive.data.aif_sample_id = self.find_value(json_data, '_adsnt_sample_id')
+          
+        # maybe obsolete '_sample_material_id' -> '_adsnt_material_id'
         child_archive.data.aif_sample_material_id = self.find_value(json_data, '_sample_material_id')
+        child_archive.data.aif_sample_material_id = self.find_value(json_data, '_adsnt_material_id')
+        
+        child_archive.data.aif_info = self.find_value(json_data, '_adsnt_info')
+        
+        child_archive.data.aif_hashkey = self.find_value(json_data, '_adsnt_hashkey')
+        
+        child_archive.data.aif_degas_summary = self.find_value(json_data, '_adsnt_degas_summary')
+        
+        child_archive.data.aif_degas_temperature = ureg.Quantity(float(self.find_value(json_data, '_adsnt_degas_temperature')), self.check_temperature_unit(self.find_value(json_data, '_units_temperature')))
+        
+        child_archive.data.aif_degas_time = ureg.Quantity(float(self.find_value(json_data, '_adsnt_degas_time')), self.check_time_unit(self.find_value(json_data, '_units_time')))
         
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')

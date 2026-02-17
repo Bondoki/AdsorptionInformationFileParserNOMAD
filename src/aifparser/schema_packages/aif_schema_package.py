@@ -303,12 +303,18 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     "aif_adsorptive_name",
                     "aif_temperature",
                     "aif_sample_mass",
+                    "aif_sample_density",
                     "aif_method",
                     "aif_isotherm_type",
                     "aif_saturation_pressure",
                     "aif_digitizer",
                     "aif_sample_id",
                     "aif_sample_material_id",
+                    "aif_info",
+                    "aif_hashkey",
+                    "aif_degas_summary",
+                    "aif_degas_temperature",
+                    "aif_degas_time",
                 ]
             }
         },
@@ -316,7 +322,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
 
     aif_operator = Quantity(
         type=str,
-        description='name of the person who ran the experiment (string).',
+        description='Name of the person who ran the experiment (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Operator',
@@ -325,7 +331,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         
     aif_date = Quantity(
         type=Datetime,
-        description='date of the experiment (string in ISO 8601 format)',
+        description='Date of the experiment (string in ISO 8601 format).',
         a_eln={
             'component': 'DateTimeEditQuantity',
             'label': 'Date',
@@ -334,7 +340,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     
     aif_instrument = Quantity(
         type=str,
-        description='instrument id used for the experiment (string)',
+        description='Instrument id used for the experiment (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Instrument',
@@ -343,7 +349,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     
     aif_adsorptive = Quantity(
         type=str,
-        description='name of the adsorptive (string)',
+        description='Name of the adsorptive (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Adsorptive',
@@ -352,7 +358,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     
     aif_adsorptive_name = Quantity(
         type=str,
-        description='name of the adsorptive - secondary identifier (string)',
+        description='Name of the adsorptive - secondary identifier (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Adsorptive - sec. identifier',
@@ -362,7 +368,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     aif_temperature = Quantity(
         type=np.float64,
         unit='kelvin',
-        description='temperature of the experiment (float)',
+        description='Temperature of the experiment (float)',
         a_eln={
              'component': 'NumberEditQuantity',
              'label': 'Temperature',
@@ -372,7 +378,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         
     aif_method = Quantity(
         type=str,
-        description='description of method used to determine amount adsorbed, eg. volumetric (string)',
+        description='Description of method used to determine amount adsorbed, e.g. volumetric (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Method',
@@ -381,7 +387,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     
     aif_isotherm_type = Quantity(
         type=str,
-        description='description of isotherm type, eg. absolute, excess, net (string)',
+        description='Description of isotherm type, eg. absolute, excess, net (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Isotherm Type',
@@ -391,7 +397,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     aif_saturation_pressure = Quantity(
         type=np.float64,
         unit='kPa',
-        description='saturation pressure of the experiment at the temperature of the experiment (float)',
+        description='Saturation pressure of the experiment at the temperature of the experiment (float).',
         a_eln={
              'component': 'NumberEditQuantity',
              'label': 'Saturation Pressure',
@@ -401,7 +407,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     
     aif_digitizer = Quantity(
         type=str,
-        description='name of the person who digitized the experiment (string)',
+        description='Name of the person who digitized the experiment (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Digitizer',
@@ -411,7 +417,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     aif_sample_mass = Quantity(
         type=np.float64,
         unit='gram',
-        description='mass of the sample (float)',
+        description='Mass of the sample (float).',
         a_eln={
              'component': 'NumberEditQuantity',
              'label': 'Sample Mass',
@@ -419,9 +425,20 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         },
     )
     
+    aif_sample_density = Quantity(
+        type=np.float64,
+        unit='gram/centimeter**3',
+        description='Density of the sample (float).',
+        a_eln={
+             'component': 'NumberEditQuantity',
+             'label': 'Sample Density',
+             'defaultDisplayUnit': 'gram/centimeter**3',
+        },
+    )
+    
     aif_sample_id = Quantity(
         type=str,
-        description='unique identifying code used by the operator (string)',
+        description='Unique identifying code used by the operator (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Sample ID',
@@ -430,13 +447,60 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     
     aif_sample_material_id = Quantity(
         type=str,
-        description='designated name for the material (string)',
+        description='Designated name for the material (string).',
         a_eln={
             'component': 'StringEditQuantity',
             'label': 'Sample Material ID',
         },
     )
     
+    aif_info = Quantity(
+        type=str,
+        description='Secondary identifier (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Info',
+        },
+    )
+    
+    aif_hashkey = Quantity(
+        type=str,
+        description='Secondary identifier (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Hashkey',
+        },
+    )
+    
+    aif_degas_summary = Quantity(
+        type=str,
+        description='Summary of degas conditions (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Degas Conditions',
+        },
+    )
+    
+    aif_degas_temperature = Quantity(
+        type=np.float64,
+        unit='kelvin',
+        description='Degas temperature (float).',
+        a_eln={
+             'component': 'NumberEditQuantity',
+             'label': 'Degas Temperature',
+             'defaultDisplayUnit': 'kelvin',
+        },
+    )
+    
+    aif_degas_time = Quantity(
+        type=np.float64,
+        description='Degas time (float).',
+        a_eln={
+             'component': 'NumberEditQuantity',
+             'label': 'Degas Time',
+             'defaultDisplayUnit': 'hour',
+        },
+    )
     
     aif_dataset = SubSection(
         section_def=AdsorptionInformationFileData,
