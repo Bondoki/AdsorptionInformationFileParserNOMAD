@@ -495,6 +495,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     aif_degas_time = Quantity(
         type=np.float64,
         description='Degas time (float).',
+        unit='hour',
         a_eln={
              'component': 'NumberEditQuantity',
              'label': 'Degas Time',
