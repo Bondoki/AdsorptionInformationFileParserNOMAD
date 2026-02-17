@@ -208,6 +208,13 @@ class AIFParser(MatchingParser):
         # #operator_value = find_value(json_data, '_exptl_operator')
         # #print(operator_value)  # Output: qc
         # 
+        
+        ###################
+        ###
+        # _adsorp_* keywords
+        ###
+        ###################
+        
         # Adsorption
         aif_data_adsorption = AdsorptionInformationFileData()
         aif_data_adsorption.aif_data_experiment_type = 'adsorption'
@@ -218,8 +225,12 @@ class AIFParser(MatchingParser):
         if (self.find_value(json_data, '_adsorp_p0')) is not None:
           aif_data_adsorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
+        # maybe obsolete '_adsorp_loading' -> '_adsorp_amount'
         if (self.find_value(json_data, '_adsorp_loading')) is not None:
-          aif_data_adsorption.aif_data_loading = ureg.Quantity(self.find_value(json_data, '_adsorp_loading'), 'dimensionless')
+          aif_data_adsorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_adsorp_loading'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_adsorp_amount')) is not None:
+          aif_data_adsorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_adsorp_amount'), 'dimensionless')
         
         aif_data_adsorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
         
@@ -234,9 +245,13 @@ class AIFParser(MatchingParser):
         if (self.find_value(json_data, '_desorp_p0')) is not None:
           aif_data_desorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_desorp_p0'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
+         # maybe obsolete '_desorp_loading' -> '_desorp_amount'
         if (self.find_value(json_data, '_desorp_loading')) is not None:
           aif_data_desorption.aif_data_loading = ureg.Quantity(self.find_value(json_data, '_desorp_loading'), 'dimensionless')
         
+        if (self.find_value(json_data, '_desorp_amount')) is not None:
+          aif_data_desorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_desorp_amount'), 'dimensionless')
+          
         aif_data_desorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
         
         

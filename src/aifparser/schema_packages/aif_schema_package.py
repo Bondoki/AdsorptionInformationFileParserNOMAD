@@ -259,11 +259,11 @@ class AdsorptionInformationFileData(EntryData):
         },
     )
     
-    aif_data_loading = Quantity(
+    aif_data_amount = Quantity(
         type=np.float64,
         shape=["*"],
         unit='dimensionless',
-        description='amount adsorbed during the adsorption/desorption measurement (float)',
+        description='Amount adsorbed during the adsorption/desorption measurement (float)',
         a_eln={
             'label': 'Adsorption/Desorption Amount (Loading)',
             'defaultDisplayUnit': 'dimensionless',
@@ -524,7 +524,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             x1 = aif_data_entries.aif_data_pressure.to(aif_data_entries.aif_data_pressure.units).magnitude
             x2 = aif_data_entries.aif_data_saturation_pressure.to(aif_data_entries.aif_data_saturation_pressure.units).magnitude
             x= x1/x2
-            y = aif_data_entries.aif_data_loading.to(aif_data_entries.aif_data_loading.units).magnitude
+            y = aif_data_entries.aif_data_amount.to(aif_data_entries.aif_data_amount.units).magnitude
             
             
             # Get the Viridis color scale
