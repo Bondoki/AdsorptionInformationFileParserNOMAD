@@ -709,7 +709,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             hoverdistance=10,
         )
         
-        fig.update_xaxes(showspikes=True,)  # <-- add this line
+        fig.update_xaxes(showspikes=True, exponentformat = 'power')  # <-- add this line; power notation
         fig.update_yaxes(showspikes=True)  # <-- add this line
         
         # figures.append(
