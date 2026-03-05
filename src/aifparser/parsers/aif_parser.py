@@ -66,6 +66,8 @@ class AIFParser(MatchingParser):
             return "pascal"
         elif pressure == "Pa":
             return "Pa"
+        elif pressure == "PA":
+            return "Pa"
         elif pressure == "kPa":
             return "kPa"
         return pressure # Return the value if not known None  # Return None for any other value
@@ -100,14 +102,20 @@ class AIFParser(MatchingParser):
             return "hour"
         return time # Return the value if not known None  # Return None for any other value
       
-    def check_load_unit(self, time: str) -> str:
-        if time == "s":
-            return "second"
-        elif time == "min":
-            return "minute"
-        elif time == "h":
-            return "hour"
-        return time # Return the value if not known None  # Return None for any other value
+    def check_load_unit(self, load: str) -> str:
+        if load == "MOL-PER-KiloGM":
+            return "mole/kg"
+        elif load == "mmolg-1":
+            return "millimole/gram"
+        return load # Return the value if not known None  # Return None for any other value
+    
+    def check_energy_unit(self, energy: str) -> str:
+        if energy == "KiloJ-PER-MOL":
+            return "kJ/mole"
+        #elif energy == "mmolg-1":
+        #    return "mmol/gram"
+        return energy # Return the value if not known None  # Return None for any other value
+    
     
     def parse(
         self,
@@ -180,6 +188,16 @@ class AIFParser(MatchingParser):
         
         ###################
         ###
+        # _citation_* and _audit_aif_* keywords
+        ###
+        ###################
+        
+        child_archive.data.aif_version = self.find_value(json_data, '_audit_aif_version')
+        child_archive.data.aif_citation_doi = self.find_value(json_data, '_citation_doi')
+        child_archive.data.aif_citation_source = self.find_value(json_data, '_citation_source')
+        
+        ###################
+        ###
         # _adsnt_* keywords
         ###
         ###################
@@ -201,8 +219,13 @@ class AIFParser(MatchingParser):
         if (self.find_value(json_data, '_adsnt_sample_id')) is not None:
           child_archive.data.aif_sample_id = self.find_value(json_data, '_adsnt_sample_id')
           
-        # maybe obsolete '_sample_material_id' -> '_adsnt_material_id'
-        child_archive.data.aif_sample_material_id = self.find_value(json_data, '_sample_material_id')
+        # maybe obsolete '_sample_material_id' '_sample_material_name' -> '_adsnt_material_id'
+        if (self.find_value(json_data, '_sample_material_id')) is not None:
+          child_archive.data.aif_sample_material_id = self.find_value(json_data, '_sample_material_id')
+        
+        if (self.find_value(json_data, '_sample_material_name')) is not None:
+          child_archive.data.aif_sample_material_id = self.find_value(json_data, '_sample_material_name')
+        
         child_archive.data.aif_sample_material_id = self.find_value(json_data, '_adsnt_material_id')
         
         child_archive.data.aif_info = self.find_value(json_data, '_adsnt_info')
@@ -235,6 +258,9 @@ class AIFParser(MatchingParser):
         if (self.find_value(json_data, '_adsorp_pressure')) is not None:
           aif_data_adsorption.aif_data_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_pressure'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
+        if (self.find_value(json_data, '_adsorp_fugacity')) is not None:
+          aif_data_adsorption.aif_data_fugacity = ureg.Quantity(self.find_value(json_data, '_adsorp_fugacity'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
+        
         if (self.find_value(json_data, '_adsorp_p0')) is not None:
           aif_data_adsorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_adsorp_p0'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
@@ -245,15 +271,37 @@ class AIFParser(MatchingParser):
         if (self.find_value(json_data, '_adsorp_amount')) is not None:
           aif_data_adsorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_adsorp_amount'), 'dimensionless')
         
+        if (self.find_value(json_data, '_adsorp_amount_excess')) is not None:
+          aif_data_adsorption.aif_data_amount_excess = ureg.Quantity(self.find_value(json_data, '_adsorp_amount_excess'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_adsorp_amount_absolute')) is not None:
+          aif_data_adsorption.aif_data_amount_absolute = ureg.Quantity(self.find_value(json_data, '_adsorp_amount_absolute'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_adsorp_amount_net')) is not None:
+          aif_data_adsorption.aif_data_amount_net = ureg.Quantity(self.find_value(json_data, '_adsorp_amount_net'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_adsorp_enthalpy')) is not None:
+          aif_data_adsorption.aif_data_enthalpy = ureg.Quantity(self.find_value(json_data, '_adsorp_enthalpy'), self.check_energy_unit(self.find_value(json_data, '_units_energy')))
+        
+        
         aif_data_adsorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
         
         
+        ###################
+        ###
+        # _desorp_* keywords
+        ###
+        ###################
         # Desorption
+        
         aif_data_desorption = AdsorptionInformationFileData()
         aif_data_desorption.aif_data_experiment_type = 'desorption'
         
         if (self.find_value(json_data, '_desorp_pressure')) is not None:
           aif_data_desorption.aif_data_pressure = ureg.Quantity(self.find_value(json_data, '_desorp_pressure'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
+        
+        if (self.find_value(json_data, '_desorp_fugacity')) is not None:
+          aif_data_desorption.aif_data_fugacity = ureg.Quantity(self.find_value(json_data, '_desorp_fugacity'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
         
         if (self.find_value(json_data, '_desorp_p0')) is not None:
           aif_data_desorption.aif_data_saturation_pressure = ureg.Quantity(self.find_value(json_data, '_desorp_p0'), self.check_pressure_unit(self.find_value(json_data, '_units_pressure')))
@@ -264,9 +312,28 @@ class AIFParser(MatchingParser):
         
         if (self.find_value(json_data, '_desorp_amount')) is not None:
           aif_data_desorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_desorp_amount'), 'dimensionless')
-          
+        
+        if (self.find_value(json_data, '_desorp_amount_excess')) is not None:
+          aif_data_desorption.aif_data_amount_excess = ureg.Quantity(self.find_value(json_data, '_desorp_amount_excess'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_desorp_amount_absolute')) is not None:
+          aif_data_desorption.aif_data_amount_absolute = ureg.Quantity(self.find_value(json_data, '_desorp_amount_absolute'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_desorp_amount_net')) is not None:
+          aif_data_desorption.aif_data_amount_net = ureg.Quantity(self.find_value(json_data, '_desorp_amount_net'), 'dimensionless')
+        
+        if (self.find_value(json_data, '_desorp_enthalpy')) is not None:
+          aif_data_adsorption.aif_data_enthalpy = ureg.Quantity(self.find_value(json_data, '_desorp_enthalpy'), self.check_energy_unit(self.find_value(json_data, '_units_energy')))
+        
+        
         aif_data_desorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
         
+        
+        ###################
+        ###
+        # Create archive entry as new JSON
+        ###
+        ###################
         
         # # check which args the function m_add_subsection accepts here:
         # # packages/nomad-FAIR/nomad/metainfo/metainfo.py

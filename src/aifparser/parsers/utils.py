@@ -70,7 +70,7 @@ def get_entry_id_from_file_name(file_name: str, archive: 'EntryArchive') -> str:
 
     return hash(archive.metadata.upload_id, file_name)
 
-
+# https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database/blob/main/src/perovskite_solar_cell_database/parsers/utils.py#L27
 def create_archive(
     entity: 'ArchiveSection',
     archive: 'EntryArchive',

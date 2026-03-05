@@ -241,9 +241,20 @@ class AdsorptionInformationFileData(EntryData):
         type=np.float64,
         shape=["*"],
         unit='kPa',
-        description='equilibrium pressure of the adsorption/desorption measurement (float)',
+        description='Equilibrium pressure of the adsorption/desorption measurement (float)',
         a_eln={
             'label': 'Adsorption/Desorption Pressure',
+            'defaultDisplayUnit': 'kPa',
+        },
+    )
+    
+    aif_data_fugacity = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='kPa',
+        description='Fugacity of the adsorption measurement (float)',
+        a_eln={
+            'label': 'Adsorption/Desorption Fugacity',
             'defaultDisplayUnit': 'kPa',
         },
     )
@@ -252,7 +263,7 @@ class AdsorptionInformationFileData(EntryData):
         type=np.float64,
         shape=["*"],
         unit='kPa',
-        description='saturation pressure of the adsorption/desorption measurement at the temperature of the experiment (float)',
+        description='Saturation pressure of the adsorption/desorption measurement at the temperature of the experiment (float)',
         a_eln={
             'label': 'Adsorption/Desorption Saturation Pressure',
             'defaultDisplayUnit': 'kPa',
@@ -292,6 +303,51 @@ class AdsorptionInformationFileData(EntryData):
         #      'defaultDisplayUnit': 'hour',
         # },
     )
+    
+    aif_data_amount_excess = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='Excess amount adsorbed during the adsorption/desorption measurement (float)',
+        a_eln={
+            'label': 'Adsorption/Desorption Excess Amount (Loading)',
+            'defaultDisplayUnit': 'dimensionless',
+        },
+    )
+    
+    aif_data_amount_absolute = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='Absolute amount adsorbed during the adsorption/desorption measurement (float)',
+        a_eln={
+            'label': 'Adsorption/Desorption Absolute Amount (Loading)',
+            'defaultDisplayUnit': 'dimensionless',
+        },
+    )
+    
+    aif_data_amount_net = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='Net amount adsorbed during the adsorption/desorption measurement (float)',
+        a_eln={
+            'label': 'Adsorption/Desorption Net Amount (Loading)',
+            'defaultDisplayUnit': 'dimensionless',
+        },
+    )
+        
+    aif_data_enthalpy = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='kJ/mole',
+        description='Enthalpy of adsorption/desorption at infinite dilution and low loading (float)',
+        a_eln={
+            'label': 'Adsorption/Desorption Enthalpy',
+            'defaultDisplayUnit': 'kJ/mole',
+        },
+    )
+    
 
 class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
     """
@@ -310,6 +366,9 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             ],
             "properties": {
                 "order": [
+                    "aif_version",
+                    "aif_citation_doi",
+                    "aif_citation_source",
                     "aif_operator",
                     "aif_date",
                     "aif_instrument",
@@ -331,6 +390,32 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     "aif_degas_time",
                 ]
             }
+        },
+    )
+    
+    aif_version = Quantity(
+        type=str,
+        description='Version of AIF data names (Github commit hash).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Version',
+        },
+    )
+        
+    aif_citation_doi = Quantity(
+        type=str,
+        description='The digital object identifier (DOI) of the cited work (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'DOI',
+        },
+    )
+    aif_citation_source = Quantity(
+        type=str,
+        description='Source of the cited work (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Source',
         },
     )
 
@@ -537,8 +622,13 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
             # Add line plots
             x1 = aif_data_entries.aif_data_pressure.to(aif_data_entries.aif_data_pressure.units).magnitude
-            x2 = aif_data_entries.aif_data_saturation_pressure.to(aif_data_entries.aif_data_saturation_pressure.units).magnitude
-            x= x1/x2
+            x= x1
+            
+            # if saturation pressure exist, then use it
+            if aif_data_entries.aif_data_saturation_pressure is not None:
+              x2 = aif_data_entries.aif_data_saturation_pressure.to(aif_data_entries.aif_data_saturation_pressure.units).magnitude
+              x = x1/x2
+            
             
             y = aif_data_entries.aif_data_amount.to('dimensionless').magnitude
             #y = aif_data_entries.aif_data_amount.to(aif_data_entries.aif_data_amount.units).magnitude
@@ -589,8 +679,14 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
 
 
         # exemply use the first entry for the units
-        x_label = 'relative pressure'
-        xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~}/{self.aif_dataset[0].aif_data_saturation_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        x_label = 'absolute pressure'
+        xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        
+        if self.aif_dataset[0].aif_data_saturation_pressure is not None:
+          x_label = 'relative pressure'
+          xaxis_title = f'{x_label}' # dimensionless
+          # xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~}/{self.aif_dataset[0].aif_data_saturation_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        
         
         y_label = 'amount adsorbed'
         yaxis_title = f'{y_label} ({self.aif_dataset[0].aif_data_loading_unit})'
@@ -601,6 +697,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             yaxis_title=yaxis_title,
             xaxis=dict(
                 fixedrange=False,
+                type='log',
             ),
             yaxis=dict(
                 fixedrange=False,
@@ -628,7 +725,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         
         figures.append(
             PlotlyFigure(
-                label=f'{y_label}-{x_label} linear plot',
+                label=f'{y_label}-{x_label} semilog plot',
                 figure=figure_json
             )
         )
