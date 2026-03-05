@@ -260,7 +260,7 @@ class AIFParser(MatchingParser):
         
          # maybe obsolete '_desorp_loading' -> '_desorp_amount'
         if (self.find_value(json_data, '_desorp_loading')) is not None:
-          aif_data_desorption.aif_data_loading = ureg.Quantity(self.find_value(json_data, '_desorp_loading'), 'dimensionless')
+          aif_data_desorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_desorp_loading'), 'dimensionless')
         
         if (self.find_value(json_data, '_desorp_amount')) is not None:
           aif_data_desorption.aif_data_amount = ureg.Quantity(self.find_value(json_data, '_desorp_amount'), 'dimensionless')
