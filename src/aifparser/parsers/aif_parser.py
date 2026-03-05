@@ -80,6 +80,8 @@ class AIFParser(MatchingParser):
     def check_temperature_unit(self, temperature: str) -> str:
         if temperature == "k":
             return "kelvin"
+        if temperature == "K":
+            return "kelvin"
         return temperature # Return the value if not known None  # Return None for any other value
     
     def check_density_unit(self, density: str) -> str:
@@ -200,9 +202,11 @@ class AIFParser(MatchingParser):
         
         child_archive.data.aif_degas_summary = self.find_value(json_data, '_adsnt_degas_summary')
         
-        child_archive.data.aif_degas_temperature = ureg.Quantity(float(self.find_value(json_data, '_adsnt_degas_temperature')), self.check_temperature_unit(self.find_value(json_data, '_units_temperature')))
+        if (self.find_value(json_data, '_adsnt_degas_temperature')) is not None:
+          child_archive.data.aif_degas_temperature = ureg.Quantity(float(self.find_value(json_data, '_adsnt_degas_temperature')), self.check_temperature_unit(self.find_value(json_data, '_units_temperature')))
         
-        child_archive.data.aif_degas_time = ureg.Quantity(float(self.find_value(json_data, '_adsnt_degas_time')), self.check_time_unit(self.find_value(json_data, '_units_time')))
+        if (self.find_value(json_data, '_adsnt_degas_time')) is not None:
+          child_archive.data.aif_degas_time = ureg.Quantity(float(self.find_value(json_data, '_adsnt_degas_time')), self.check_time_unit(self.find_value(json_data, '_units_time')))
         
         # # Call the function
         # #operator_value = find_value(json_data, '_exptl_operator')
@@ -279,15 +283,15 @@ class AIFParser(MatchingParser):
         #aif = MyClassTwo()
         #aif.name = self.find_value(json_data, '_exptl_operator')
         
-        # create_archive(
-        #         aif, archive, f'{basic_name}.archive.json'
-        #     )
-        
         create_archive(
-            # child_archive.m_to_dict(with_root_def=True),
-            child_archive.m_to_dict(),
-            archive.m_context,
-            example_filename,
-            filetype,
-            logger,
-        )
+                child_archive, archive, example_filename
+            )
+        
+        # create_archive(
+        #     # child_archive.m_to_dict(with_root_def=True),
+        #     child_archive.m_to_dict(),
+        #     archive.m_context,
+        #     example_filename,
+        #     filetype,
+        #     logger,
+        # )

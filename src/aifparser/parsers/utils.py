@@ -45,6 +45,54 @@ from nomad.utils import hash
 
 timezone = 'Europe/Berlin'
 
+import math
+import os.path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nomad.datamodel.data import (
+        ArchiveSection,
+    )
+    from nomad.datamodel.datamodel import (
+        EntryArchive,
+    )
+    from structlog.stdlib import (
+        BoundLogger,
+    )
+
+
+def get_reference(upload_id: str, entry_id: str) -> str:
+    return f'../uploads/{upload_id}/archive/{entry_id}#data'
+
+
+def get_entry_id_from_file_name(file_name: str, archive: 'EntryArchive') -> str:
+    from nomad.utils import hash
+
+    return hash(archive.metadata.upload_id, file_name)
+
+
+def create_archive(
+    entity: 'ArchiveSection',
+    archive: 'EntryArchive',
+    file_name: str,
+) -> str:
+    import json
+
+    from nomad.datamodel.context import ClientContext
+
+    entity_entry = entity.m_to_dict(with_root_def=True)
+    if isinstance(archive.m_context, ClientContext):
+        with open(file_name, 'w') as outfile:
+            json.dump({'data': entity_entry}, outfile, indent=4)
+        return os.path.abspath(file_name)
+    if not archive.m_context.raw_path_exists(file_name):
+        with archive.m_context.raw_file(file_name, 'w') as outfile:
+            json.dump({'data': entity_entry}, outfile)
+        archive.m_context.process_updated_raw_file(file_name)
+    return get_reference(
+        archive.metadata.upload_id, get_entry_id_from_file_name(file_name, archive)
+    )
+  
 
 def clean_name(name):
     """
@@ -110,32 +158,32 @@ def dict_nan_equal(dict1, dict2):
     return True
 
 
-def create_archive(
-    entry_dict, context, filename, file_type, logger, *, overwrite: bool = False
-):
-    # file_exists = context.raw_path_exists(filename)
-    file_exists = getattr(context, 'raw_path_exists', lambda _: None)(filename)
-    dicts_are_equal = None
-    if isinstance(context, ClientContext):
-        return None
-    if file_exists:
-        with context.raw_file(filename, 'r') as file:
-            existing_dict = yaml.safe_load(file)
-            dicts_are_equal = dict_nan_equal(existing_dict, entry_dict)
-    if not file_exists or overwrite or dicts_are_equal:
-        with context.raw_file(filename, 'w') as newfile:
-            if file_type == 'json':
-                json.dump(entry_dict, newfile)
-            elif file_type == 'yaml':
-                yaml.dump(entry_dict, newfile)
-        context.upload.process_updated_raw_file(filename, allow_modify=True)
-    elif file_exists and not overwrite and not dicts_are_equal:
-        logger.error(
-            f'{filename} archive file already exists. '
-            f'You are trying to overwrite it with a different content. '
-            f'To do so, remove the existing archive and click reprocess again.'
-        )
-    return get_hash_ref(context.upload_id, filename)
+# def create_archive(
+#     entry_dict, context, filename, file_type, logger, *, overwrite: bool = False
+# ):
+#     # file_exists = context.raw_path_exists(filename)
+#     file_exists = getattr(context, 'raw_path_exists', lambda _: None)(filename)
+#     dicts_are_equal = None
+#     if isinstance(context, ClientContext):
+#         return None
+#     if file_exists:
+#         with context.raw_file(filename, 'r') as file:
+#             existing_dict = yaml.safe_load(file)
+#             dicts_are_equal = dict_nan_equal(existing_dict, entry_dict)
+#     if not file_exists or overwrite or dicts_are_equal:
+#         with context.raw_file(filename, 'w') as newfile:
+#             if file_type == 'json':
+#                 json.dump(entry_dict, newfile)
+#             elif file_type == 'yaml':
+#                 yaml.dump(entry_dict, newfile)
+#         context.upload.process_updated_raw_file(filename, allow_modify=True)
+#     elif file_exists and not overwrite and not dicts_are_equal:
+#         logger.error(
+#             f'{filename} archive file already exists. '
+#             f'You are trying to overwrite it with a different content. '
+#             f'To do so, remove the existing archive and click reprocess again.'
+#         )
+#     return get_hash_ref(context.upload_id, filename)
 
 
 

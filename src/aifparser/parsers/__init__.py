@@ -8,7 +8,7 @@ class AIFParserEntryPoint(ParserEntryPoint):
     def load(self):
         from aifparser.parsers.aif_parser import AIFParser
 
-        return AIFParser(**self.dict())
+        return AIFParser(**self.model_dump())
 
 aif_parser_entry_point = AIFParserEntryPoint(
     name='AIF Parser',
