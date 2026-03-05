@@ -104,9 +104,9 @@ class AIFParser(MatchingParser):
       
     def check_load_unit(self, load: str) -> str:
         if load == "MOL-PER-KiloGM":
-            return "mole/kg"
+            return "mol/kg"
         elif load == "mmolg-1":
-            return "millimole/gram"
+            return "mmol/g"
         return load # Return the value if not known None  # Return None for any other value
     
     def check_energy_unit(self, energy: str) -> str:
@@ -198,6 +198,27 @@ class AIFParser(MatchingParser):
         
         ###################
         ###
+        # __simltn_* keywords
+        ###
+        ###################
+        child_archive.data.aif_simltn_code = self.find_value(json_data, '_simltn_code')
+        child_archive.data.aif_simltn_date = self.find_value(json_data, '_simltn_date')
+        child_archive.data.aif_simltn_size = self.find_value(json_data, '_simltn_size')
+        
+        if (self.find_value(json_data, '_simltn_forcefield_adsorbate')) is not None:
+          child_archive.data.aif_simltn_forcefield_adsorptive = self.find_value(json_data, '_simltn_forcefield_adsorbate')
+        
+        if (self.find_value(json_data, '_simltn_forcefield_adsorptive')) is not None:
+          child_archive.data.aif_simltn_forcefield_adsorptive = self.find_value(json_data, '_simltn_forcefield_adsorptive')
+        
+        
+        child_archive.data.aif_simltn_forcefield_adsorbent = self.find_value(json_data, '_simltn_forcefield_adsorbent')
+        child_archive.data.aif_simltn_input_files = self.find_value(json_data, '_simltn_input_files')
+        child_archive.data.aif_simltn_sampling = self.find_value(json_data, '_simltn_sampling')
+        child_archive.data.aif_simltn_lot = self.find_value(json_data, '_simltn_lot')
+        
+        ###################
+        ###
         # _adsnt_* keywords
         ###
         ###################
@@ -284,7 +305,7 @@ class AIFParser(MatchingParser):
           aif_data_adsorption.aif_data_enthalpy = ureg.Quantity(self.find_value(json_data, '_adsorp_enthalpy'), self.check_energy_unit(self.find_value(json_data, '_units_energy')))
         
         
-        aif_data_adsorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
+        aif_data_adsorption.aif_data_loading_unit = self.check_load_unit(self.find_value(json_data, '_units_loading'))
         
         
         ###################
@@ -326,7 +347,7 @@ class AIFParser(MatchingParser):
           aif_data_adsorption.aif_data_enthalpy = ureg.Quantity(self.find_value(json_data, '_desorp_enthalpy'), self.check_energy_unit(self.find_value(json_data, '_units_energy')))
         
         
-        aif_data_desorption.aif_data_loading_unit = self.find_value(json_data, '_units_loading')
+        aif_data_desorption.aif_data_loading_unit = self.check_load_unit(self.find_value(json_data, '_units_loading'))
         
         
         ###################
@@ -359,15 +380,15 @@ class AIFParser(MatchingParser):
         #aif = MyClassTwo()
         #aif.name = self.find_value(json_data, '_exptl_operator')
         
-        create_archive(
-                child_archive, archive, example_filename
-            )
-        
         # create_archive(
-        #     # child_archive.m_to_dict(with_root_def=True),
-        #     child_archive.m_to_dict(),
-        #     archive.m_context,
-        #     example_filename,
-        #     filetype,
-        #     logger,
-        # )
+        #         child_archive, archive, example_filename
+        #     )
+        
+        create_archive(
+            # child_archive.m_to_dict(with_root_def=True),
+            child_archive.m_to_dict(),
+            archive.m_context,
+            example_filename,
+            filetype,
+            logger,
+        )

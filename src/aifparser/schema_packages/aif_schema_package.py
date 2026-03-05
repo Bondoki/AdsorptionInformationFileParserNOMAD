@@ -388,10 +388,19 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     "aif_degas_summary",
                     "aif_degas_temperature",
                     "aif_degas_time",
+                    "aif_simltn_code",
+                    "aif_simltn_date",
+                    "aif_simltn_size",
+                    "aif_simltn_forcefield_adsorptive",
+                    "aif_simltn_forcefield_adsorbent",
+                    "aif_simltn_input_files",
+                    "aif_simltn_sampling",
+                    "aif_simltn_lot",
                 ]
             }
         },
     )
+    
     
     aif_version = Quantity(
         type=str,
@@ -601,6 +610,79 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
              'defaultDisplayUnit': 'hour',
         },
     )
+    
+    aif_simltn_code = Quantity(
+        type=str,
+        description='Secondary identifier (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Code',
+        },
+    )
+    
+    aif_simltn_date = Quantity(
+        type=Datetime,
+        description='Date of the simulation (string in ISO 8601 format).',
+        a_eln={
+            'component': 'DateTimeEditQuantity',
+            'label': 'Simulation Date',
+        },
+    )
+    
+    aif_simltn_size = Quantity(
+        type=str,
+        description='Num of unit cells, sample mass, etc. (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Size',
+        },
+    )
+    
+    aif_simltn_forcefield_adsorptive = Quantity(
+        type=str,
+        description='Adsorptive model details (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Forcefield Adsorptive',
+        },
+    )
+    
+    aif_simltn_forcefield_adsorbent = Quantity(
+        type=str,
+        description='Adsorbent model details (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Forcefield Adsorbent',
+        },
+    )
+    
+    aif_simltn_input_files = Quantity(
+        type=str,
+        description='Depository link to input files and other codes used in the simulation (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Input Files',
+        },
+    )
+    
+    aif_simltn_sampling = Quantity(
+        type=str,
+        description='Phase space sampling algorithm (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Sampling algorithm',
+        },
+    )
+    
+    aif_simltn_lot = Quantity(
+        type=str,
+        description='Level of theory used in calculation, e.g. DFT, MLP, classical etc. (string).',
+        a_eln={
+            'component': 'StringEditQuantity',
+            'label': 'Simulation Level of Theory',
+        },
+    )
+    
     
     aif_dataset = SubSection(
         section_def=AdsorptionInformationFileData,

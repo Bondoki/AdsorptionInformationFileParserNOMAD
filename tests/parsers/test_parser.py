@@ -16,7 +16,8 @@ def test_parse_file():
     
     #archives = parse('tests/data/dut_134_scd_n2_77k.aif')
     #test_file = os.path.join('tests', 'data', 'dut_134_scd_n2_77k.aif')
-    test_file = os.path.join('tests', 'data', 'anie202513606-sup-0002-suppmat2/CALF-20-CO2-320K.aif')
+    #test_file = os.path.join('tests', 'data', 'anie202513606-sup-0002-suppmat2/CALF-20-CO2-320K.aif')
+    test_file = os.path.join('tests', 'data', 'anie202513606-sup-0002-suppmat2/ZIF8_GCMC_UFFTRAPPE.aif')
     entry_archive = parse(test_file)[0]
     normalize_all(entry_archive)
     print(entry_archive.m_to_dict())
