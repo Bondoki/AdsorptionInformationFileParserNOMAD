@@ -704,7 +704,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
           if aif_data_entries.aif_data_pressure is not None: # sometimes there are no desorption data
             #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
             # Add line plots
-            print("DATA PRESSURE: "+ aif_data_entries.aif_data_pressure.units)
+            #print("DATA PRESSURE: "+ aif_data_entries.aif_data_pressure.units)
             x1 = aif_data_entries.aif_data_pressure.to(aif_data_entries.aif_data_pressure.units).magnitude
             x= x1
             
