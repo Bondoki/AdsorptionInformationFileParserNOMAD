@@ -99,6 +99,15 @@ class AIFParser(MatchingParser):
         elif time == "h":
             return "hour"
         return time # Return the value if not known None  # Return None for any other value
+      
+    def check_load_unit(self, time: str) -> str:
+        if time == "s":
+            return "second"
+        elif time == "min":
+            return "minute"
+        elif time == "h":
+            return "hour"
+        return time # Return the value if not known None  # Return None for any other value
     
     def parse(
         self,

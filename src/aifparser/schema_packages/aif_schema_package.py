@@ -262,6 +262,12 @@ class AdsorptionInformationFileData(EntryData):
     aif_data_amount = Quantity(
         type=np.float64,
         shape=["*"],
+        # unit='centimeter**3',
+        # description='Amount adsorbed during the adsorption/desorption measurement (float)',
+        # a_eln={
+        #     'label': 'Adsorption/Desorption Amount (Loading)',
+        #     'defaultDisplayUnit': 'centimeter**3',
+        # },
         unit='dimensionless',
         description='Amount adsorbed during the adsorption/desorption measurement (float)',
         a_eln={
@@ -277,6 +283,14 @@ class AdsorptionInformationFileData(EntryData):
             'component': 'StringEditQuantity',
             'label': 'Loading Unit',
         },
+        # type=np.float64,
+        # description='units of amount adsorbed - for displaying, only (float).',
+        # unit='centimeter**3',
+        # a_eln={
+        #      'component': 'NumberEditQuantity',
+        #      'label': 'Adsorption/Desorption Time',
+        #      'defaultDisplayUnit': 'hour',
+        # },
     )
 
 class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
@@ -525,7 +539,9 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             x1 = aif_data_entries.aif_data_pressure.to(aif_data_entries.aif_data_pressure.units).magnitude
             x2 = aif_data_entries.aif_data_saturation_pressure.to(aif_data_entries.aif_data_saturation_pressure.units).magnitude
             x= x1/x2
-            y = aif_data_entries.aif_data_amount.to(aif_data_entries.aif_data_amount.units).magnitude
+            
+            y = aif_data_entries.aif_data_amount.to('dimensionless').magnitude
+            #y = aif_data_entries.aif_data_amount.to(aif_data_entries.aif_data_amount.units).magnitude
             
             
             # Get the Viridis color scale
