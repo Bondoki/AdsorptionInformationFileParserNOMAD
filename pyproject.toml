@@ -132,7 +132,7 @@ where = ["src"]
 [project.entry-points.'nomad.plugin']
 aif_parser_entry_point = "aifparser.parsers:aif_parser_entry_point"
 aif_schema_package_entry_point = "aifparser.schema_packages:aif_schema_package_entry_point"
-
+aif_app_entry_point = "aifparser.apps:aif_app_entry_point"
 
 
 
