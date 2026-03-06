@@ -723,7 +723,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             
             #spectral_colors = px.colors.sequential.Spectral
             
-            turbo_colors = px.colors.sequential.Turbo
+            turbo_colors = px.colors.sequential.Aggrnyl # Turbo
             
             #color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
             

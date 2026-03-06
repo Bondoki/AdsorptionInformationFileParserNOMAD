@@ -127,7 +127,8 @@ class AIFParser(MatchingParser):
         logger.info('AIFParser.parse', parameter=configuration.parameter)
 
         filename = mainfile.split('/')[-1]
-        basic_name = filename.split('.')
+        basic_name = filename.rsplit('.', 1) # as some file use period for decimal numbers
+        #filename.split('.')
 
         # archive.data = CatalysisCollectionParserEntry(
         #     data_file=filename,
