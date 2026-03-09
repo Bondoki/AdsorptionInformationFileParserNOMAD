@@ -29,21 +29,23 @@ from nomad.config.models.ui import (
     Column,
     Dashboard,
     Layout,
+    Markers,
     Menu,
     MenuItemPeriodicTable,
     MenuItemHistogram,
     MenuItemTerms,
     SearchQuantities,
     WidgetHistogram,
+    WidgetScatterPlot,
 )
 schema = 'aifparser.schema_packages.aif_schema_package.AdsorptionInformationFile'
 # schema = 'nomad_example.schema_packages.mypackage.MySchema'
 aif_app_entry_point = AppEntryPoint(
-    name='MyApp',
-    description='App defined using the new plugin mechanism.',
+    name='App AIF',
+    description='App for the Adsorption Information File (AIF) database.',
     app=App(
         # Label of the App
-        label='AIF',
+        label='Adsorption Information File (AIF)',
         # Path used in the URL, must be unique
         path='adsorptioninformationfile',
         # Used to categorize apps in the explore menu
@@ -145,7 +147,7 @@ aif_app_entry_point = AppEntryPoint(
                     autorange=True,
                     nbins=30,
                     scale='linear',
-                    x=Axis(search_quantity=f'data.aif_temperature#{schema}', title='Temperature'),
+                    x=Axis(search_quantity=f'data.aif_temperature#{schema}', title='Temperature', unit='kelvin'),
                     layout={'lg': Layout(minH=3, minW=3, h=4, w=12, y=0, x=0)},
                 ),
                 WidgetHistogram(
@@ -154,9 +156,20 @@ aif_app_entry_point = AppEntryPoint(
                     autorange=True,
                     nbins=30,
                     scale='linear',
-                    x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Mass'),
+                    x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Mass', unit='milligram'),
                     layout={'lg': Layout(minH=3, minW=3, h=4, w=12, y=0, x=12)},
                 ),
+                WidgetScatterPlot(
+                    title='Scatterplot Mass-Temperature',
+                    autorange=True,
+                    layout={
+                        'lg': Layout(h=8, minH=3, minW=8, w=12, x=0, y=4),
+                        },
+                    x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Mass', unit='milligram'),
+                    y=Axis(search_quantity=f'data.aif_temperature#{schema}', title='Temperature', unit='kelvin'),
+                    markers=Markers(color=Axis(search_quantity=f'data.aif_operator#{schema}')),
+                    size=1000,  # maximum number of entries loaded
+                    ),
             ]
         ),
     ),
