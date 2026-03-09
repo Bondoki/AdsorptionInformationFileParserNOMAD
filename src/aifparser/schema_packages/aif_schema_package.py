@@ -2,9 +2,9 @@ from typing import (
     TYPE_CHECKING,
 )
 
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import numpy as np
 
 if TYPE_CHECKING:
     pass
@@ -13,158 +13,19 @@ from nomad.datamodel.data import (
     ArchiveSection,
     EntryData,
 )
-from nomad.datamodel.hdf5 import HDF5Reference
-from nomad.datamodel.metainfo.annotations import (
-    ELNAnnotation,
-    H5WebAnnotation,
-)
 from nomad.datamodel.metainfo.plot import (
     PlotlyFigure,
     PlotSection,
 )
 from nomad.metainfo import (
+    Datetime,
     Quantity,
     SchemaPackage,
     Section,
     SubSection,
 )
 
-from nomad.metainfo import (
-    MSection, MCategory, Section, Quantity, Package, SubSection, MEnum,
-    Datetime, constraint)
-
 m_package = SchemaPackage()
-
-
-class MyClassOne(PlotSection, EntryData):
-    m_def = Section(
-        a_plotly_express={
-            'method': 'line',
-            'x': '#my_value',
-            'y': '#my_time',
-            'label': 'Example Express Plot',
-            'index': 0,
-            'layout': {
-                'title': {'text': 'Example Express Plot'},
-                'xaxis': {'title': {'text': 'x axis'}},
-                'yaxis': {'title': {'text': 'y axis'}},
-            },
-        },
-    )
-
-    name = Quantity(
-        type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-        ),
-    )
-
-    my_value = Quantity(
-        type=float,
-        shape=['*'],
-        unit='K',
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-            defaultDisplayUnit='celsius',
-        ),
-    )
-
-    my_time = Quantity(
-        type=float,
-        shape=['*'],
-        unit='s',
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-            defaultDisplayUnit='minute',
-        ),
-    )
-    
-    aif_instrument = Quantity(
-        type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-            label="Instrument",
-            editable="False",
-        ),
-    )
-        
-    aif_instrument2 = Quantity(
-        type=str,
-        a_eln=ELNAnnotation(
-            label="Instrument2",
-        ),
-    )
-        
-    TGA_Mass_Subtrate = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='dimensionless',
-        description='The measured mass at temperature in the TGA, given in percent.',
-        a_eln=dict(label='AIF mass', defaultDisplayUnit = 'dimensionless'),
-    )
-
-class MyClassTwo(EntryData, ArchiveSection):
-    """
-    An example class
-    """
-
-    m_def = Section(
-        a_plot=[
-            dict(
-                label='Pressure and Temperature',
-                x=[
-                    'my_class_one/0/my_time',
-                ],
-                y=[
-                    'my_class_one/0/my_value',
-                ],
-                lines=[
-                    dict(
-                        mode='lines',
-                        line=dict(
-                            color='rgb(25, 46, 135)',
-                        ),
-                    ),
-                    dict(
-                        mode='lines',
-                        line=dict(
-                            color='rgb(0, 138, 104)',
-                        ),
-                    ),
-                ],
-            ),
-            # dict(
-            #     x='sources/0/vapor_source/power/time',
-            #     y='sources/0/vapor_source/power/value',
-            # ),
-        ],
-    )
-
-    name = Quantity(
-        type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-        ),
-    )
-        
-    aif_instrument = Quantity(
-        type=str,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-            label="Instrument",
-            editable="False",
-        ),
-    )
-
-    aif_instrument2 = Quantity(
-        type=str,
-    )
-
-    my_class_one = SubSection(
-        section_def=MyClassOne,
-        repeats=True,
-    )
-
 
 #class AdsorptionInformationFileData(PlotSection, EntryData):
 class AdsorptionInformationFileData(EntryData):
@@ -186,18 +47,6 @@ class AdsorptionInformationFileData(EntryData):
                 ]
             }
         },
-        # a_plotly_express={
-        #     'method': 'line',
-        #     'x': '#aif_data_adsorp_pressure',
-        #     'y': '#aif_data_adsorp_loading',
-        #     'label': 'Example Express Plot',
-        #     'index': 0,
-        #     'layout': {
-        #         'title': {'text': 'Example Express Plot'},
-        #         'xaxis': {'title': {'text': 'x axis'}},
-        #         'yaxis': {'title': {'text': 'y axis'}},
-        #     },
-        # },
     )
 
     aif_data_experiment_type = Quantity(
@@ -208,34 +57,6 @@ class AdsorptionInformationFileData(EntryData):
             'label': 'experiment Type',
         },
     )
-
-    # my_value = Quantity(
-    #     type=float,
-    #     shape=['*'],
-    #     unit='K',
-    #     a_eln=ELNAnnotation(
-    #         component='NumberEditQuantity',
-    #         defaultDisplayUnit='celsius',
-    #     ),
-    # )
-    # 
-    # my_time = Quantity(
-    #     type=float,
-    #     shape=['*'],
-    #     unit='s',
-    #     a_eln=ELNAnnotation(
-    #         component='NumberEditQuantity',
-    #         defaultDisplayUnit='minute',
-    #     ),
-    # )
-#         
-#     TGA_Mass_Subtrate = Quantity(
-#         type=np.float64,
-#         shape=["*"],
-#         unit='dimensionless',
-#         description='The measured mass at temperature in the TGA, given in percent.',
-#         a_eln=dict(label='AIF mass', defaultDisplayUnit = 'dimensionless'),
-#     )
     
     aif_data_pressure = Quantity(
         type=np.float64,
@@ -294,14 +115,6 @@ class AdsorptionInformationFileData(EntryData):
             'component': 'StringEditQuantity',
             'label': 'Loading Unit',
         },
-        # type=np.float64,
-        # description='units of amount adsorbed - for displaying, only (float).',
-        # unit='centimeter**3',
-        # a_eln={
-        #      'component': 'NumberEditQuantity',
-        #      'label': 'Adsorption/Desorption Time',
-        #      'defaultDisplayUnit': 'hour',
-        # },
     )
     
     aif_data_amount_excess = Quantity(
@@ -796,13 +609,6 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         fig.update_xaxes(showspikes=True, exponentformat = 'power')  # <-- add this line; power notation
         fig.update_yaxes(showspikes=True)  # <-- add this line
         
-        # figures.append(
-        #     PlotlyFigure(
-        #         label=f'{y_label}-{x_label} linear plot',
-        #         #index=0,
-        #         figure=fig.to_plotly_json(),
-        #     ),
-        # )
         
         figure_json = fig.to_plotly_json()
         figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
@@ -826,193 +632,6 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             self.figures = self.generate_plots()
         
         super().normalize(archive, logger)
-
-class MyClassThree(PlotSection, EntryData):
-    """
-    An example class
-    """
-
-    m_def = Section(
-        a_plotly_graph_object=[
-            {
-                'label': 'shaft temperature',
-                'index': 0,
-                'dragmode': 'pan',
-                'data': {
-                    'type': 'scattergl',
-                    'line': {'width': 2},
-                    'marker': {'size': 6},
-                    'mode': 'lines+markers',
-                    'name': 'Temperature',
-                    'x': '#my_time',
-                    'y': '#my_value',
-                },
-                'layout': {
-                    'title': {'text': 'Shaft Temperature'},
-                    'xaxis': {
-                        'showticklabels': True,
-                        'fixedrange': True,
-                        'ticks': '',
-                        'title': {'text': 'Process time [min]'},
-                        'showline': True,
-                        'linewidth': 1,
-                        'linecolor': 'black',
-                        'mirror': True,
-                    },
-                    'yaxis': {
-                        'showticklabels': True,
-                        'fixedrange': True,
-                        'ticks': '',
-                        'title': {'text': 'Temperature [°C]'},
-                        'showline': True,
-                        'linewidth': 1,
-                        'linecolor': 'black',
-                        'mirror': True,
-                    },
-                    'showlegend': False,
-                },
-                'config': {
-                    'displayModeBar': False,
-                    'scrollZoom': False,
-                    'responsive': False,
-                    'displaylogo': False,
-                    'dragmode': False,
-                },
-            },
-            # {
-            #     ...
-            # },
-        ],
-    )
-    name = Quantity(
-        type=str,
-        description="""
-        Sample name.
-        """,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-        ),
-    )
-    my_value = Quantity(
-        type=float,
-        shape=['*'],
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-        ),
-    )
-
-    my_time = Quantity(
-        type=float,
-        shape=['*'],
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-        ),
-    )
-
-
-class MyClassFour(PlotSection, EntryData):
-    """
-    Class autogenerated from yaml schema.
-    """
-
-    my_value = Quantity(
-        type=float,
-        shape=['*'],
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-        ),
-    )
-
-    my_time = Quantity(
-        type=float,
-        shape=['*'],
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-        ),
-    )
-    my_value_bis = Quantity(
-        type=float,
-        shape=['*'],
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-        ),
-    )
-
-    my_time_bis = Quantity(
-        type=float,
-        shape=['*'],
-        a_eln=ELNAnnotation(
-            component='NumberEditQuantity',
-        ),
-    )
-
-    def normalize(self, archive, logger):
-        # plotly figure
-        fig = go.Figure()
-        fig.add_trace(
-            go.Scatter(
-                x=self.my_time,
-                y=self.my_value,
-                name='Sub Temp',
-                line=dict(color='#2A4CDF', width=4),
-                yaxis='y',
-            ),
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=self.my_time_bis,
-                y=self.my_value_bis,
-                name='Pyro Temp',
-                line=dict(color='#90002C', width=2),
-                yaxis='y',
-            ),
-        )
-        fig.update_layout(
-            template='plotly_white',
-            dragmode='zoom',
-            xaxis=dict(
-                fixedrange=False,
-                autorange=True,
-                title='Process time / s',
-                mirror='all',
-                showline=True,
-                gridcolor='#EAEDFC',
-            ),
-            yaxis=dict(
-                fixedrange=False,
-                title='Temperature / °C',
-                tickfont=dict(color='#2A4CDF'),
-                gridcolor='#EAEDFC',
-            ),
-            showlegend=True,
-        )
-        self.figures = [PlotlyFigure(label='my figure 1', figure=fig.to_plotly_json())]
-
-
-class MyClassFive(EntryData, ArchiveSection):
-    """
-    An example class
-    """
-
-    name = Quantity(
-        type=str,
-        description="""
-        Sample name.
-        """,
-        a_eln=ELNAnnotation(
-            component='StringEditQuantity',
-        ),
-    )
-
-    reference = Quantity(
-        type=MyClassOne,
-        description='A reference to a NOMAD `MyClassOne` entry.',
-        a_eln=ELNAnnotation(
-            component='ReferenceEditQuantity',
-            label='MyClassOne Reference',
-        ),
-    )
-
 
 m_package.__init_metainfo__()
  
