@@ -21,10 +21,7 @@
 #
 import json
 import math
-import os
-from datetime import datetime
 from typing import TYPE_CHECKING
-from zoneinfo import ZoneInfo
 
 #import h5py
 import numpy as np
@@ -32,43 +29,26 @@ import pandas as pd
 import yaml
 
 if TYPE_CHECKING:
-    from structlog.stdlib import (
-        BoundLogger,
-    )
+    pass
 from nomad.datamodel.context import ClientContext
-from nomad.datamodel.data import ArchiveSection
-# from nomad.datamodel.metainfo.basesections import (
-#     ExperimentStep,
-# )
-from nomad.units import ureg
-from nomad.utils import hash
+
+if TYPE_CHECKING:
+    pass
+
+#from nomad.utils import hash
 
 timezone = 'Europe/Berlin'
 
-import math
-import os.path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from nomad.datamodel.data import (
-        ArchiveSection,
-    )
-    from nomad.datamodel.datamodel import (
-        EntryArchive,
-    )
-    from structlog.stdlib import (
-        BoundLogger,
-    )
 
 
-def get_reference(upload_id: str, entry_id: str) -> str:
-    return f'../uploads/{upload_id}/archive/{entry_id}#data'
+# https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database/blob/main/src/perovskite_solar_cell_database/parsers/utils.py#L17
+# def get_reference(upload_id: str, entry_id: str) -> str:
+#     return f'../uploads/{upload_id}/archive/{entry_id}#data'
 
-
-def get_entry_id_from_file_name(file_name: str, archive: 'EntryArchive') -> str:
-    from nomad.utils import hash
-
-    return hash(archive.metadata.upload_id, file_name)
+# https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database/blob/main/src/perovskite_solar_cell_database/parsers/utils.py#L21
+# def get_entry_id_from_file_name(file_name: str, archive: 'EntryArchive') -> str:
+# 
+#     return hash(archive.metadata.upload_id, file_name)
 
 # https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database/blob/main/src/perovskite_solar_cell_database/parsers/utils.py#L27
 # def create_archive(
@@ -111,7 +91,6 @@ def get_reference(upload_id, entry_id):
 
 
 def get_entry_id(upload_id, filename):
-    from nomad.utils import hash
 
     return hash(upload_id, filename)
 
