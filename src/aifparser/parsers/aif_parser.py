@@ -7,35 +7,21 @@ if TYPE_CHECKING:
         BoundLogger,
     )
 
-from nomad.datamodel.datamodel import (
-        EntryArchive,
-    )
-
-from nomad.config import config
-from nomad.datamodel.metainfo.workflow import Workflow
-from nomad.parsing.parser import MatchingParser
-# from nomad.parsing.file_parser import Quantity
-from nomad.units import ureg
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    )
+import json
+import os
 
 from gemmi import cif
-import json
+from nomad.config import config
+from nomad.datamodel.datamodel import (
+    EntryArchive,
+)
+from nomad.parsing.parser import MatchingParser
+from nomad.units import ureg
 
 from aifparser.parsers.utils import (
     create_archive,
 )
-
 from aifparser.schema_packages.aif_schema_package import (
-    MyClassFive,
-    MyClassOne,
-    #MyClassOneHDF5,
-    MyClassTwo,
-    #MyClassTwoHDF5,
     AdsorptionInformationFile,
     AdsorptionInformationFileData,
 )
@@ -126,8 +112,10 @@ class AIFParser(MatchingParser):
     ) -> None:
         logger.info('AIFParser.parse', parameter=configuration.parameter)
 
-        filename = mainfile.split('/')[-1]
-        basic_name = filename.rsplit('.', 1) # as some file use period for decimal numbers
+        #filename = mainfile.split('/')[-1]
+        #basic_name = filename.rsplit('.', 1) # as some file use period for decimal numbers
+        filename = os.path.basename(mainfile)  # Extrahiert den Dateinamen aus dem Pfad
+        basic_name, _ = os.path.splitext(filename)  # Teilt den Dateinamen in den Namen und die Erweiterung 
         #filename.split('.')
 
         # archive.data = CatalysisCollectionParserEntry(
@@ -158,9 +146,7 @@ class AIFParser(MatchingParser):
         # 
         # #my_name = 'And'
         filetype = 'json' # 'yaml' # "json"
-        # 
         example_filename = f'{basic_name[0]}.archive.{filetype}'
-        # 
         child_archive.data = AdsorptionInformationFile()
         
         ###################
