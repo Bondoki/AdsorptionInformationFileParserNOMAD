@@ -8,7 +8,6 @@ from nomad.config.models.ui import (
     Markers,
     Menu,
     MenuItemHistogram,
-    MenuItemPeriodicTable,
     MenuItemTerms,
     SearchQuantities,
     WidgetHistogram,
@@ -68,10 +67,6 @@ aif_app_entry_point = AppEntryPoint(
                 Menu(
                     title='Elements',
                     items=[
-                        MenuItemPeriodicTable(
-                            quantity='results.material.elements',
-                            width=8,
-                        ),
                         MenuItemTerms(
                             quantity='results.material.chemical_formula_hill',
                             width=6,

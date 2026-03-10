@@ -510,7 +510,8 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             "adaptor": "RawFileAdaptor"
         },
         a_eln={
-            "component": "FileEditQuantity"
+            "component": "FileEditQuantity",
+            "label": "Auxiliary cif",
         },
     )
     
