@@ -655,9 +655,9 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         
         try:
             #Check if there's any .cif file provided in main section
-            if self.aif_data_as_cif_file:
-                if not self.aif_data_as_cif_file.endswith('.cif'):
-                    raise DataFileError(f"The file '{self.aif_data_as_cif_file}' must have a .cif extension.")
+            if self.aif_cif_file:
+                if not self.aif_cif_file.endswith('.cif'):
+                    raise DataFileError(f"The file '{self.aif_cif_file}' must have a .cif extension.")
                 
                 from ase.io import read
                 from nomad.normalizing import normalizers
@@ -673,7 +673,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                 from nomad.normalizing.common import nomad_atoms_from_ase_atoms
                 from nomad.normalizing.topology import add_system, add_system_info
 
-                with archive.m_context.raw_file(self.aif_data_as_cif_file) as f:
+                with archive.m_context.raw_file(self.aif_cif_file) as f:
                     try:
                         ase_atoms = read(f.name)
                     except Exception as e:
@@ -690,7 +690,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     # and chemical information that is suitable for both experiments and simulations.
                     system = System(
                         atoms=nomad_atoms_from_ase_atoms(ase_atoms),
-                        label='File:' + self.aif_data_as_cif_file,
+                        label='File:' + self.aif_cif_file,
                         description='Structure read from the file.',
                         structural_type='bulk',
                         dimensionality='3D',
