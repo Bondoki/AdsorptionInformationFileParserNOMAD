@@ -27,6 +27,12 @@ from nomad.metainfo import (
 
 m_package = SchemaPackage()
 
+
+class DataFileError(Exception):
+    """Custom exception for data file errors."""
+    pass
+
+
 #class AdsorptionInformationFileData(PlotSection, EntryData):
 class AdsorptionInformationFileData(EntryData):
     m_def = Section(
@@ -209,6 +215,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     "aif_simltn_input_files",
                     "aif_simltn_sampling",
                     "aif_simltn_lot",
+                    "aif_cif_file",
                 ]
             }
         },
@@ -496,6 +503,17 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         },
     )
     
+    aif_cif_file = Quantity(
+        type=str,
+        description="A reference to an uploaded .cif file containing the 'Crystallographic Information File'.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+    
     
     aif_dataset = SubSection(
         section_def=AdsorptionInformationFileData,
@@ -625,13 +643,70 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         return figures
     
     
-    def normalize(self, archive, logger):
+    #def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+    def normalize(self, archive, logger) -> None:
         
         if self.aif_dataset:
             #Otherwise create plot
             self.figures = self.generate_plots()
         
         super().normalize(archive, logger)
+        
+        
+        try:
+            #Check if there's any .cif file provided in main section
+            if self.aif_data_as_cif_file:
+                if not self.aif_data_as_cif_file.endswith('.cif'):
+                    raise DataFileError(f"The file '{self.aif_data_as_cif_file}' must have a .cif extension.")
+                
+                from ase.io import read
+                from nomad.normalizing import normalizers
+
+                system_normalizer_cls = None
+                for normalizer in normalizers:
+                    if normalizer.__name__ == 'SystemNormalizer':
+                        system_normalizer_cls = normalizer
+                        break
+
+                from nomad.atomutils import Formula
+                from nomad.datamodel.results import Material, System
+                from nomad.normalizing.common import nomad_atoms_from_ase_atoms
+                from nomad.normalizing.topology import add_system, add_system_info
+
+                with archive.m_context.raw_file(self.aif_data_as_cif_file) as f:
+                    try:
+                        ase_atoms = read(f.name)
+                    except Exception as e:
+                        raise ValueError('could not read structure file') from e
+
+                    if not archive.results.material:
+                        archive.results.material = Material()
+                        # extract molecular_formula out of cif file
+                        self.molecular_formula = ase_atoms.get_chemical_formula()
+                        formula = Formula(ase_atoms.get_chemical_formula())
+                        formula.populate(archive.results.material)
+
+                    # Create a System: this is a NOMAD specific data structure for storing structural
+                    # and chemical information that is suitable for both experiments and simulations.
+                    system = System(
+                        atoms=nomad_atoms_from_ase_atoms(ase_atoms),
+                        label='File:' + self.aif_data_as_cif_file,
+                        description='Structure read from the file.',
+                        structural_type='bulk',
+                        dimensionality='3D',
+                    )
+
+                    # archive.results.topology can used to represent relations between systems.
+                    # E.g. "System A is part of System B". In our case there is only a single system.
+                    topology = {}
+                    add_system_info(system, topology)
+                    add_system(system, topology)
+                    archive.results.material.topology = list(topology.values())
+                    
+
+        except Exception as e:
+            logger.error('Error exception during parsing/processing.', exc_info=e)
+        
 
 m_package.__init_metainfo__()
  

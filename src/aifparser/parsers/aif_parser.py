@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     )
 
 import json
-import os
 
 from gemmi import cif
 from nomad.config import config
@@ -112,10 +111,10 @@ class AIFParser(MatchingParser):
     ) -> None:
         logger.info('AIFParser.parse', parameter=configuration.parameter)
 
-        #filename = mainfile.split('/')[-1]
-        #basic_name = filename.rsplit('.', 1) # as some file use period for decimal numbers
-        filename = os.path.basename(mainfile)  # Extrahiert den Dateinamen aus dem Pfad
-        basic_name, _ = os.path.splitext(filename)  # Teilt den Dateinamen in den Namen und die Erweiterung 
+        filename = mainfile.split('/')[-1]
+        basic_name = filename.rsplit('.', 1) # as some file use period for decimal numbers
+        #filename = os.path.basename(mainfile)  # Extrahiert den Dateinamen aus dem Pfad
+        #basic_name, _ = os.path.splitext(filename)  # Teilt den Dateinamen in den Namen und die Erweiterung 
         #filename.split('.')
 
         # archive.data = CatalysisCollectionParserEntry(

@@ -12,6 +12,7 @@ from nomad.config.models.ui import (
     MenuItemTerms,
     SearchQuantities,
     WidgetHistogram,
+    WidgetPeriodicTable,
     WidgetScatterPlot,
 )
 
@@ -69,6 +70,7 @@ aif_app_entry_point = AppEntryPoint(
                     items=[
                         MenuItemPeriodicTable(
                             quantity='results.material.elements',
+                            width=8,
                         ),
                         MenuItemTerms(
                             quantity='results.material.chemical_formula_hill',
@@ -140,13 +142,19 @@ aif_app_entry_point = AppEntryPoint(
                     title='Scatterplot Mass-Temperature',
                     autorange=True,
                     layout={
-                        'lg': Layout(h=8, minH=3, minW=8, w=12, x=0, y=4),
+                        'lg': Layout(h=6, minH=3, minW=8, w=12, x=0, y=4),
                         },
                     x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Mass', unit='milligram'),
                     y=Axis(search_quantity=f'data.aif_temperature#{schema}', title='Temperature', unit='kelvin'),
                     markers=Markers(color=Axis(search_quantity=f'data.aif_operator#{schema}')),
                     size=1000,  # maximum number of entries loaded
                     ),
+                WidgetPeriodicTable(
+                    title='Elements of the material',
+                    layout={'lg': Layout(h=6, minH=6, minW=12, w=12, x=12, y=0),},
+                        search_quantity='results.material.elements',
+                        scale='linear',
+                        ),
             ]
         ),
     ),

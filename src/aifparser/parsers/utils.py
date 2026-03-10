@@ -35,7 +35,7 @@ from nomad.datamodel.context import ClientContext
 if TYPE_CHECKING:
     pass
 
-#from nomad.utils import hash
+from nomad.utils import hash
 
 timezone = 'Europe/Berlin'
 
@@ -136,7 +136,7 @@ def dict_nan_equal(dict1, dict2):
             return False
     return True
 
-
+# https://github.com/PDI-Berlin/pdi-nomad-plugin/blob/main/src/pdi_nomad_plugin/utils.py
 def create_archive(
     entry_dict, context, filename, file_type, logger, *, overwrite: bool = False
 ):

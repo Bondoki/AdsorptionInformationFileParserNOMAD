@@ -97,6 +97,8 @@ select = [
 
 ignore = [
     "F403", # 'from module import *' used; unable to detect undefined names
+    "F841", # Local variable is assigned to but never used
+    "PLC0207", # String is split more times than necessary
     "PLC0415", # `import` should be at the top-level of a file
     "E501", # line too long
     "PLR0912", # Too many branches (# > 12)
