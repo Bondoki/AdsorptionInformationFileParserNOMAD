@@ -88,7 +88,7 @@ aif_app_entry_point = AppEntryPoint(
                    size='md',
                    items=[
                           MenuItemTerms(
-                            width=6,
+                            #width=6,
                             search_quantity=f'data.aif_operator#{schema}',
                             ),
                         ],
@@ -98,7 +98,7 @@ aif_app_entry_point = AppEntryPoint(
                    size='md',
                    items=[
                           MenuItemTerms(
-                            width=6,
+                            #width=6,
                             search_quantity=f'data.aif_adsorptive#{schema}',
                             ),
                          ],
@@ -108,6 +108,16 @@ aif_app_entry_point = AppEntryPoint(
                    size='md',
                    items=[
                           MenuItemHistogram(x=Axis(search_quantity=f'data.aif_date#{schema}')),
+                         ],
+                  ),
+              Menu(
+                   title='Instrument',
+                   size='md',
+                   items=[
+                          MenuItemTerms(
+                            #width=6,
+                            search_quantity=f'data.aif_instrument#{schema}',
+                            ),
                          ],
                   ),
             ],
@@ -130,17 +140,20 @@ aif_app_entry_point = AppEntryPoint(
                     autorange=True,
                     nbins=30,
                     scale='linear',
-                    x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Mass', unit='milligram'),
+                    x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Sample Mass', unit='milligram'),
                     layout={'lg': Layout(minH=3, minW=3, h=4, w=12, y=0, x=12)},
                 ),
                 WidgetScatterPlot(
-                    title='Scatterplot Mass-Temperature',
+                    title='Scatterplot Date-Temperature',
+                    #title='Scatterplot Mass-Temperature',
                     autorange=True,
                     layout={
                         'lg': Layout(h=6, minH=3, minW=8, w=12, x=0, y=4),
                         },
-                    x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Mass', unit='milligram'),
+                    x=Axis(search_quantity=f'data.aif_date#{schema}', title='Date'),
                     y=Axis(search_quantity=f'data.aif_temperature#{schema}', title='Temperature', unit='kelvin'),
+                    #x=Axis(search_quantity=f'data.aif_sample_mass#{schema}', title='Sample Mass', unit='milligram'),
+                    #y=Axis(search_quantity=f'data.aif_temperature#{schema}', title='Temperature', unit='kelvin'),
                     markers=Markers(color=Axis(search_quantity=f'data.aif_operator#{schema}')),
                     size=1000,  # maximum number of entries loaded
                     ),
