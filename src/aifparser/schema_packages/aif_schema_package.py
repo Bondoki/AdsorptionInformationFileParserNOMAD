@@ -550,6 +550,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         figures = []
         # Create the figure
         fig = go.Figure()
+        fig_lin_lin = go.Figure()
         
         for idx, aif_data_entries in enumerate(self.aif_dataset):
           if aif_data_entries.aif_data_pressure is not None: # sometimes there are no desorption data
@@ -579,8 +580,6 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             # Get the Viridis color scale
             viridis_colors = px.colors.sequential.Viridis
             
-            #spectral_colors = px.colors.sequential.Spectral
-            
             turbo_colors = px.colors.sequential.Aggrnyl # Turbo
             
             color_index_line = (
@@ -604,22 +603,52 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                 marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond')      # Marker size
             ))
             
+            fig_lin_lin.add_trace(go.Scatter(
+                x=x,
+                y=y,
+                mode='lines+markers',  # 'lines+markers' to show both lines and markers
+                name=f'{aif_data_entries.aif_data_experiment_type}: {idx}',
+                line=dict(color=viridis_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else turbo_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond')      # Marker size
+            ))
+            
             ###
             # Amount_excess
             ###
             if aif_data_entries.aif_data_amount_excess is not None:
+                
+                spectral_colors = px.colors.sequential.Spectral
+                
+                color_index_line = (
+                int(idx / (len(self.aif_dataset) - 1) * (len(spectral_colors) - 1))
+                if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorption'
+                else int((1.0 - idx / (len(self.aif_dataset) - 1)) * (len(spectral_colors) - 1)) if len(self.aif_dataset) > 1
+                else 0
+                )
+                
                 fig.add_trace(go.Scatter(
                     x=x,
                     y=y_excess,
                     mode='lines+markers',  # 'lines+markers' to show both lines and markers
                     name=f'adsorp_excess: {idx}' if aif_data_entries.aif_data_experiment_type == 'adsorption' else f'desorp_excess: {idx}',
-                    line=dict(color=viridis_colors[-color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else turbo_colors[-color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    line=dict(color=spectral_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else spectral_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                     hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-                    marker=dict(size=10, symbol='circle-open' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond')      # Marker size
+                    marker=dict(size=10, symbol='circle-open' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond-open')      # Marker size
                 ))
-
-
-        # exemply use the first entry for the units
+                
+                fig_lin_lin.add_trace(go.Scatter(
+                    x=x,
+                    y=y_excess,
+                    mode='lines+markers',  # 'lines+markers' to show both lines and markers
+                    name=f'adsorp_excess: {idx}' if aif_data_entries.aif_data_experiment_type == 'adsorption' else f'desorp_excess: {idx}',
+                    line=dict(color=spectral_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else spectral_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                    marker=dict(size=10, symbol='circle-open' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond-open')      # Marker size
+                ))
+        ###
+        # Semi-log plot
+        ###
         x_label = 'absolute pressure'
         xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~})'#(1/cm)' the ':~' gives the short form
         
@@ -654,6 +683,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         fig.update_yaxes(showspikes=True)  # <-- add this line
         
         
+        
         figure_json = fig.to_plotly_json()
         figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
         
@@ -661,6 +691,52 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             PlotlyFigure(
                 label=f'{y_label}-{x_label} semilog plot',
                 figure=figure_json
+            )
+        )
+            
+        ###
+        # lin-lin plot
+        ###
+        x_label = 'absolute pressure'
+        xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        
+        if self.aif_dataset[0].aif_data_saturation_pressure is not None:
+          x_label = 'relative pressure'
+          xaxis_title = f'{x_label}' # dimensionless
+          # xaxis_title = f'{x_label} ({self.aif_dataset[0].aif_data_pressure.units:~}/{self.aif_dataset[0].aif_data_saturation_pressure.units:~})'#(1/cm)' the ':~' gives the short form
+        
+        y_label = 'amount adsorbed'
+        yaxis_title = f'{y_label} ({self.aif_dataset[0].aif_data_loading_unit})'
+        
+        fig_lin_lin.update_layout(
+            title=f'{y_label} over {x_label} - AIF',
+            xaxis_title=xaxis_title,
+            yaxis_title=yaxis_title,
+            xaxis=dict(
+                fixedrange=False,
+            ),
+            yaxis=dict(
+                fixedrange=False,
+            ),
+            #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+            template='plotly_white',
+            showlegend=True,
+            hovermode="closest", #"x unified",
+            hoverdistance=10,
+        )
+        
+        fig_lin_lin.update_xaxes(showspikes=True, exponentformat = 'power')  # <-- add this line; power notation
+        fig_lin_lin.update_yaxes(showspikes=True)  # <-- add this line
+        
+        
+        
+        figure_json_lin_lin = fig_lin_lin.to_plotly_json()
+        figure_json_lin_lin['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+        
+        figures.append(
+            PlotlyFigure(
+                label=f'{y_label}-{x_label} lin-lin plot',
+                figure=figure_json_lin_lin
             )
         )
         
