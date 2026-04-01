@@ -120,6 +120,16 @@ aif_app_entry_point = AppEntryPoint(
                             ),
                          ],
                   ),
+              Menu(
+                   title='Tags',
+                   size='md',
+                   items=[
+                          MenuItemTerms(
+                            #width=6,
+                            search_quantity=f'data.aif_tags#{schema}',
+                            ),
+                         ],
+                  ),
             ],
         ),
         # Controls the default dashboard shown in the search interface

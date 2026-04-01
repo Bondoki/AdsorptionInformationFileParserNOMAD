@@ -60,7 +60,7 @@ class AdsorptionInformationFileData(EntryData):
         description='type of experiment e.g. adsorption/desorption - for displaying, only (string)',
         a_eln={
             'component': 'StringEditQuantity',
-            'label': 'experiment Type',
+            'label': 'Experiment Type',
         },
     )
     
@@ -553,9 +553,9 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         
         for idx, aif_data_entries in enumerate(self.aif_dataset):
           if aif_data_entries.aif_data_pressure is not None: # sometimes there are no desorption data
-            #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
-            # Add line plots
-            #print("DATA PRESSURE: "+ aif_data_entries.aif_data_pressure.units)
+            ###
+            # Amount
+            ###
             x1 = aif_data_entries.aif_data_pressure.to(aif_data_entries.aif_data_pressure.units).magnitude
             x= x1
             
@@ -564,10 +564,17 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
               x2 = aif_data_entries.aif_data_saturation_pressure.to(aif_data_entries.aif_data_saturation_pressure.units).magnitude
               x = x1/x2
             
-            
             y = aif_data_entries.aif_data_amount.to('dimensionless').magnitude
-            #y = aif_data_entries.aif_data_amount.to(aif_data_entries.aif_data_amount.units).magnitude
             
+            ###
+            # Amount_excess
+            ###
+            if aif_data_entries.aif_data_amount_excess is not None:
+                y_excess = aif_data_entries.aif_data_amount_excess.to('dimensionless').magnitude
+            
+            ###
+            # Coloring
+            ###
             
             # Get the Viridis color scale
             viridis_colors = px.colors.sequential.Viridis
@@ -576,32 +583,17 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             
             turbo_colors = px.colors.sequential.Aggrnyl # Turbo
             
-            #color_index_line = int(idx / (len(self.aif_dataset)-1) * (len(viridis_colors) - 1)) if len(self.aif_dataset) > 1 else 0
-            
-#             color_index_line = (
-#                 int(idx / (len(self.aif_dataset) - 1) * (len(viridis_colors) - 1)) 
-#                 if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorped' 
-#                 else int(idx / (len(self.aif_dataset) - 1) * (len(spectral_colors) - 1)) if len(self.aif_dataset) > 1 
-#                 else 0
-#             )
-# 
-#             
-#             fig.add_trace(go.Scatter(
-#                 x=x,
-#                 y=y,
-#                 mode='lines+markers',  # 'lines+markers' to show both lines and markers
-#                 name=f'{aif_data_entries.aif_data_experiment_type}: {idx}',
-#                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
-#                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-#                 marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorped' else 'diamond')      # Marker size
-#             ))
             color_index_line = (
                 int(idx / (len(self.aif_dataset) - 1) * (len(viridis_colors) - 1))
                 if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorption'
                 else int(idx / (len(self.aif_dataset) - 1) * (len(turbo_colors) - 1)) if len(self.aif_dataset) > 1
                 else 0
             )
-
+            
+            
+            ###
+            # Amount
+            ###
             fig.add_trace(go.Scatter(
                 x=x,
                 y=y,
@@ -611,6 +603,20 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
                 marker=dict(size=10, symbol='circle' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond')      # Marker size
             ))
+            
+            ###
+            # Amount_excess
+            ###
+            if aif_data_entries.aif_data_amount_excess is not None:
+                fig.add_trace(go.Scatter(
+                    x=x,
+                    y=y_excess,
+                    mode='lines+markers',  # 'lines+markers' to show both lines and markers
+                    name=f'adsorp_excess: {idx}' if aif_data_entries.aif_data_experiment_type == 'adsorption' else f'desorp_excess: {idx}',
+                    line=dict(color=viridis_colors[-color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else turbo_colors[-color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                    marker=dict(size=10, symbol='circle-open' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond')      # Marker size
+                ))
 
 
         # exemply use the first entry for the units
@@ -627,7 +633,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         yaxis_title = f'{y_label} ({self.aif_dataset[0].aif_data_loading_unit})'
         
         fig.update_layout(
-            title=f'{y_label} over {x_label} - Adsorption Information File',
+            title=f'{y_label} over {x_label} - AIF',
             xaxis_title=xaxis_title,
             yaxis_title=yaxis_title,
             xaxis=dict(
