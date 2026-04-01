@@ -618,12 +618,12 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             ###
             if aif_data_entries.aif_data_amount_excess is not None:
                 
-                spectral_colors = px.colors.sequential.Spectral
+                plasma_colors = px.colors.sequential.Plasma
                 
                 color_index_line = (
-                int(idx / (len(self.aif_dataset) - 1) * (len(spectral_colors) - 1))
+                int(idx / (len(self.aif_dataset) - 1) * (len(plasma_colors) - 1))
                 if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorption'
-                else int((1.0 - idx / (len(self.aif_dataset) - 1)) * (len(spectral_colors) - 1)) if len(self.aif_dataset) > 1
+                else int(idx / (len(self.aif_dataset) - 1)) * (len(plasma_colors) - 1)) if len(self.aif_dataset) > 1
                 else 0
                 )
                 
@@ -632,7 +632,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     y=y_excess,
                     mode='lines+markers',  # 'lines+markers' to show both lines and markers
                     name=f'adsorp_excess: {idx}' if aif_data_entries.aif_data_experiment_type == 'adsorption' else f'desorp_excess: {idx}',
-                    line=dict(color=spectral_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else spectral_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    line=dict(color=plasma_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else plasma_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                     hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
                     marker=dict(size=10, symbol='circle-open' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond-open')      # Marker size
                 ))
@@ -642,7 +642,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     y=y_excess,
                     mode='lines+markers',  # 'lines+markers' to show both lines and markers
                     name=f'adsorp_excess: {idx}' if aif_data_entries.aif_data_experiment_type == 'adsorption' else f'desorp_excess: {idx}',
-                    line=dict(color=spectral_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else spectral_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    line=dict(color=plasma_colors[color_index_line] if aif_data_entries.aif_data_experiment_type == 'adsorption' else plasma_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                     hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
                     marker=dict(size=10, symbol='circle-open' if aif_data_entries.aif_data_experiment_type == 'adsorption' else 'diamond-open')      # Marker size
                 ))
