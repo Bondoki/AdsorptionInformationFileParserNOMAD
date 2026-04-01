@@ -149,7 +149,7 @@ def create_archive(
         with context.raw_file(filename, 'r') as file:
             existing_dict = yaml.safe_load(file)
             dicts_are_equal = dict_nan_equal(existing_dict, entry_dict)
-    if not file_exists or overwrite or dicts_are_equal:
+    if not file_exists or overwrite:# or dicts_are_equal:
         with context.raw_file(filename, 'w') as newfile:
             if file_type == 'json':
                 json.dump(entry_dict, newfile)

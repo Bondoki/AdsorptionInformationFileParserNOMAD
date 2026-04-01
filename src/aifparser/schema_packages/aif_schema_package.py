@@ -185,6 +185,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
             ],
             "properties": {
                 "order": [
+                    "aif_tags",
                     "aif_version",
                     "aif_citation_doi",
                     "aif_citation_source",
@@ -216,11 +217,21 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                     "aif_simltn_sampling",
                     "aif_simltn_lot",
                     "aif_cif_file",
+                    "aif_description",
                 ]
             }
         },
     )
     
+    aif_tags = Quantity(
+        type=str,
+        description='Tagging the AIF data for search and findability.',
+        a_eln={
+            "component": "StringEditQuantity",
+            'label': 'Tags',
+        },
+        shape=["*"],
+    )
     
     aif_version = Quantity(
         type=str,
@@ -515,6 +526,14 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
         },
     )
     
+    aif_description = Quantity(
+        type=str,
+        description='Any information, which needs to be provided for the experiment (string).',
+        a_eln={
+            "component": "RichTextEditQuantity",
+            'label': 'Description',
+        },
+    )
     
     aif_dataset = SubSection(
         section_def=AdsorptionInformationFileData,
