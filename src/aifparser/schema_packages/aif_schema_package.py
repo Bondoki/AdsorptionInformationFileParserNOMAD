@@ -623,7 +623,7 @@ class AdsorptionInformationFile(PlotSection, EntryData, ArchiveSection):
                 color_index_line = (
                 int(idx / (len(self.aif_dataset) - 1) * (len(plasma_colors) - 1))
                 if len(self.aif_dataset) > 1 and aif_data_entries.aif_data_experiment_type == 'adsorption'
-                else int(idx / (len(self.aif_dataset) - 1)) * (len(plasma_colors) - 1)) if len(self.aif_dataset) > 1
+                else int((idx / (len(self.aif_dataset) - 1)) * (len(plasma_colors) - 1)) if len(self.aif_dataset) > 1
                 else 0
                 )
                 
