@@ -29,3 +29,19 @@ abstract  ="The isolation of 2D nanosheets of layered metal–organic frameworks
   groups    = {AIF},
   publisher = {Wiley},
 }
+
+- Test data taken from Supporting Information of paper: https://doi.org/10.1039/D4SC08223K
+
+@Article{D4SC08223K1,
+author ="Abylgazina, Leila and Senkovska, Irena and Maliuta, Mariia and Bachetzky, Christopher and Rauche, Marcus and Pöschel, Kathrin and Schmidt, Johannes and Isaacs, Mark and Morgan, David and Otyepka, Michal and Otyepkova, Eva and Mendt, Matthias and More, Yogeshwar D. and Buschbeck, Robin and Schneemann, Andreas and Synytska, Alla and Pöppl, Andreas and Eng, Lukas M. and Tan, Jin-Chong and Brunner, Eike and Kaskel, Stefan",
+title  ="The role of surface deformation on responsivity of the pillared layer metal–organic framework DUT-8(Ni)",
+journal  ="Chem. Sci.",
+year  ="2025",
+volume  ="16",
+issue  ="15",
+pages  ="6402-6417",
+publisher  ="The Royal Society of Chemistry",
+doi  ="10.1039/D4SC08223K",
+url  ="http://dx.doi.org/10.1039/D4SC08223K",
+}
+
