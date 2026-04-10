@@ -144,9 +144,20 @@ class AIFParser(MatchingParser):
         # 
         child_archive = EntryArchive()
         # 
-        # #my_name = 'And'
+        # We need to deal with the path of the archive
+        # to place the json in the right folder if we upload a zip file or single one
         filetype = 'json' # 'yaml' # "json"
-        example_filename = f'{basic_name[0]}.archive.{filetype}'
+        example_filename_json = f'{basic_name[0]}.archive.{filetype}'
+
+        after_path = mainfile.rpartition('/raw/')[-1]
+        example_filename = (after_path[:after_path.rfind('/')+1] if '/' in after_path else '')+example_filename_json
+        
+        ###################
+        ###
+        # SCHEMA: AdsorptionInformationFile 
+        ###
+        ###################
+        
         child_archive.data = AdsorptionInformationFile()
         
         ###################
