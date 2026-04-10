@@ -121,6 +121,7 @@ class AIFParser(MatchingParser):
         #     data_file=filename,
         # )
         #archive.metadata.entry_name = f'{basic_name[0]} data file'
+        archive.metadata.entry_type = 'AIF'
         
         # Read and import the aif file using gemmi
         aif = cif.read_file(str(mainfile))
